@@ -35,6 +35,9 @@ jobs:
     - name: Configure Conan
       run: conan profile new default --detect && conan profile update settings.compiler.libcxx=libstdc++11 default
 
+    - name: Install Dependency
+      run: conan install .. --build=missing
+
     - name: Configure CMake
       # Use a bash shell so we can use the same syntax for environment variable
       # access regardless of the host operating system
@@ -50,7 +53,7 @@ jobs:
       working-directory: ${{github.workspace}}/build
       shell: bash
       # Execute the build.  You can specify a specific target with "--target <NAME>"
-      run: conan install .. --build=missing && cmake --build . --config $BUILD_TYPE
+      run: cmake --build . --config $BUILD_TYPE
 
     - name: Test
       working-directory: ${{github.workspace}}/build
