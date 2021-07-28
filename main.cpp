@@ -7,7 +7,7 @@ using namespace cinatra;
 
 void bind_http(http_server& server){
     server.set_http_handler<GET,POST>("/",handler::home_page); //The home page
-    server.set_http_handler<POST>("/update_file", handler::upload_file); //Update file handler
+    server.set_http_handler<GET,POST>("/update_file", handler::upload_file); //Update file handler
 }
 
 int main() {
