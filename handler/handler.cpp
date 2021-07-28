@@ -29,7 +29,7 @@ namespace handler{
         auto ip_address = req.get_header_value("X-Forwarded-For");
         SPDLOG_INFO("ip={}",ip_address);
         SPDLOG_INFO("time={}", std::chrono::system_clock::now().time_since_epoch().count());
-        res.set_status(status_type::ok);
+        res.set_status_and_content(status_type::ok,"hello please upload a file here",req_content_type::string);
     }
 
     
