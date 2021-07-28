@@ -28,6 +28,7 @@ namespace handler{
     void upload_file(cinatra::request& req, cinatra::response& res){
         auto ip_address = req.get_header_value("X-Forwarded-For");
         SPDLOG_INFO("ip={}",ip_address);
+        SPDLOG_INFO("time={}", std::vector{1,2,3});
         res.set_status(status_type::ok);
     }
 
