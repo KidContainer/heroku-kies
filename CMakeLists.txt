@@ -8,7 +8,7 @@ if(LIMIT_MEM)
     add_compile_options("SHELL:--param ggc-min-expand=1" "SHELL:--param ggc-min-heapsize=131072")
 endif()
 
-# add_compile_options(-g)
+add_compile_options(-g)
 
 add_subdirectory(lib)
 
