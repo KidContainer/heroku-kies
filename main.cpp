@@ -12,20 +12,18 @@ void bind_http(http_server& server){
 }
 
 int main() {
-    // const char* port = std::getenv("PORT");
-    // if(port == nullptr){
-    //     port = "8080";
-    // }
-    // SPDLOG_INFO("PORT={}",port);
-    // std::size_t max_thread_num = std::thread::hardware_concurrency();
-    // http_server server(max_thread_num);
-    // server.listen("0.0.0.0", port);
+    const char* port = std::getenv("PORT");
+    if(port == nullptr){
+        port = "8080";
+    }
+    SPDLOG_INFO("PORT={}",port);
+    std::size_t max_thread_num = std::thread::hardware_concurrency();
+    http_server server(max_thread_num);
+    server.listen("0.0.0.0", port);
     
-    // bind_http(server);
+    bind_http(server);
 
-    // server.run();
-
-    std::cout<<utils::read_template("../../template/html/index.html")<<std::endl;
+    server.run();
 
     return 0;
 }
