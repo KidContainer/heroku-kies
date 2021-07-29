@@ -2,7 +2,6 @@
 boost/1.75.0
 spdlog/1.9.0
 nlohmann_json/3.9.1
-inja/3.2.0
 libpqxx/7.5.2
 
 [generators]

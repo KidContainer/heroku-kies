@@ -14,11 +14,12 @@ add_subdirectory(lib)
 
 aux_source_directory(db db)
 aux_source_directory(handler handler)
+aux_source_directory(utils utils)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
-add_executable(heroku_kies main.cpp ${db} ${handler})
+add_executable(heroku_kies main.cpp ${db} ${handler} ${utils})
 target_link_libraries(heroku_kies PRIVATE lib ${CONAN_LIBS})
 
 install(TARGETS heroku_kies DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/..)
