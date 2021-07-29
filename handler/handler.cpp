@@ -1,31 +1,24 @@
-#include "boost/date_time/posix_time/posix_time.hpp"
-
-
 #include "handler.hpp"
 #include <spdlog/spdlog.h>
 #include <nlohmann/json.hpp>
+
+#include <memory>
 
 #include "../db/t_flow.hpp"
 #include "../utils/file.hpp"
 
 using namespace cinatra;
 
+namespace handler
+{
 
-namespace handler{
-
-    void home_page(cinatra::request& req, cinatra::response& res){
-        auto ip_address = req.get_header_value("X-Forwarded-For");
-        SPDLOG_INFO("ip={}",ip_address);
-        
-        res.set_status_and_content(status_type::ok,utils::read_template("template/html/index.html"), req_content_type::html, content_encoding::gzip);
+    void upload_file(cinatra::request &req, cinatra::response &res)
+    {
+        SPDLOG_INFO("request={}, filename={}", req.data(), req.get_filename_from_path());
+        auto file = req.get_file();
+        auto buf = std::make_unique<char[]>(file->get_file_size()+1);
+        file->write(buf.get(), file->get_file_size());
+        res.set_status_and_content(status_type::ok,std::string{buf.get(),file->get_file_size()},req_content_type::string, content_encoding::gzip);
     }
 
-
-    void upload_file(cinatra::request& req, cinatra::response& res){
-
-    }
-
-    
 } // namespace handler
-
-

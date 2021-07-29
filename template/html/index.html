@@ -1,14 +1,35 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Basic Web Page</title>
-        <link rel="stylesheet" href="css/style.css"/>
-    </head>
-    <body>
-        <div>
-            Hello {{name}}, current time is {{current_time}}!
-        </div>
-        <img alt="Cat" src="https://icatcare.org/app/uploads/2018/07/Thinking-of-getting-a-cat.png"/>
 
-    </body>
+<head>
+    <title>Basic Web Page</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://unpkg.com/vue@next"></script>
+</head>
+
+<body>
+    <div>
+        Hello 
+        <span v-bind:title="true_name">{{name}}</span>, current time is {{current_time}}!
+    </div>
+
+    <script>
+        let data = {
+            data() {
+                return {
+                    name: "World",
+                    current_time: new Date().toLocaleString(),
+                    true_name:"Yes"
+                }
+            },
+            mounted() {
+                setInterval(() => this.current_time = new Date().toLocaleString(), 1000);
+            }
+        }
+
+
+        Vue.createApp(data).mount('div')
+    </script>
+</body>
+
 </html>
