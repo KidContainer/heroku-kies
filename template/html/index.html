@@ -10,20 +10,27 @@
 <body>
     <div>
         Hello 
-        <span v-bind:title="true_name">{{name}}</span>, current time is {{current_time}}!
+        <span v-bind:title="true_name">{{name}}</span>, current time is {{current_time}}, current count is {{count}}!
+        <button v-on:click="increase">Click Me</button>
     </div>
-
     <script>
         let data = {
             data() {
                 return {
                     name: "World",
+                    count: 1,
                     current_time: new Date().toLocaleString(),
                     true_name:"Yes"
                 }
             },
             mounted() {
-                setInterval(() => this.current_time = new Date().toLocaleString(), 1000);
+                let that = this;
+                setInterval(function(){that.current_time = new Date().toLocaleString()}, 1000);
+            },
+            methods:{
+                increase(){
+                    this.count++;
+                }
             }
         }
 
