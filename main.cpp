@@ -13,7 +13,7 @@ void bind_page(http_server &server)
 
 void bind_api(http_server &server)
 {
-    server.set_http_handler<POST>("/api/update_file", handler::upload_file); //Update file handler
+    server.set_http_handler<POST>("/api/upload_file", handler::upload_file); //Update file handler
 }
 
 int main()
