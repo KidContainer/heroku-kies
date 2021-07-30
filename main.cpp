@@ -27,6 +27,7 @@ int main()
     std::size_t max_thread_num = std::thread::hardware_concurrency();
     http_server server(max_thread_num);
     server.listen("0.0.0.0", port);
+    server.set_not_found_handler(handler::not_found_page);
 
     bind_page(server);
     bind_api(server);

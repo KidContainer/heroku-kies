@@ -11,4 +11,9 @@ namespace utils
         return std::string(std::istreambuf_iterator<char>{file}, {});
     }
 
+    std::string read_binary(std::string_view file_path){
+        std::fstream file(file_path.data(), std::ios::in|std::ios::binary);
+        return std::string(std::istreambuf_iterator<char>{file}, {});
+    }
+
 }

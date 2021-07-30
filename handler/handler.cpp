@@ -14,11 +14,14 @@ namespace handler
 
     void upload_file(cinatra::request &req, cinatra::response &res)
     {
-        SPDLOG_INFO("request={}, filename={}", req.data(), req.get_filename_from_path());
         auto file = req.get_file();
-        auto buf = std::make_unique<char[]>(file->get_file_size()+1);
-        file->write(buf.get(), file->get_file_size());
-        res.set_status_and_content(status_type::ok,std::string{buf.get(),file->get_file_size()},req_content_type::string, content_encoding::gzip);
+        if(file==nullptr){
+            res.set_status(status_type::bad_request);
+            return;
+        }
+        SPDLOG_INFO("size={}, file={}",file->get_file_size(), file->get_file_path());
+        res.set_status_and_content(status_type::ok,utils::read_binary(file->get_file_path()),req_content_type::multipart, content_encoding::gzip);
+
     }
 
 } // namespace handler
