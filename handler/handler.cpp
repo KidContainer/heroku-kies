@@ -16,11 +16,11 @@ namespace handler
     {
         auto file = req.get_file();
         if(file==nullptr){
-            res.set_status(status_type::bad_request);
+            res.set_status_and_content(status_type::bad_request,"no file provided", req_content_type::string);
             return;
         }
         SPDLOG_INFO("size={}, file={}",file->get_file_size(), file->get_file_path());
-        res.set_status_and_content(status_type::ok,file->get_file_path(),req_content_type::multipart, content_encoding::gzip);
+        res.set_status_and_content(status_type::ok,file->get_file_path(),req_content_type::multipart);
 
     }
 
