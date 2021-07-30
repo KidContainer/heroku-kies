@@ -15,7 +15,7 @@ namespace handler
         auto ip_address = req.get_header_value("X-Forwarded-For");
         SPDLOG_INFO("ip={}", ip_address);
 
-        res.set_status_and_content(status_type::ok, utils::read_template("../../template/html/index.html"), req_content_type::html, content_encoding::gzip);
+        res.set_status_and_content(status_type::ok, utils::read_template("template/html/index.html"), req_content_type::html, content_encoding::gzip);
     }
 
 } // namespace handler
