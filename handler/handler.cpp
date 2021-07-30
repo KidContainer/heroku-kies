@@ -20,7 +20,7 @@ namespace handler
             return;
         }
         SPDLOG_INFO("size={}, file={}",file->get_file_size(), file->get_file_path());
-        res.set_status_and_content(status_type::ok,utils::read_binary(file->get_file_path()),req_content_type::multipart, content_encoding::gzip);
+        res.set_status_and_content(status_type::ok,file->get_file_path(),req_content_type::multipart, content_encoding::gzip);
 
     }
 
