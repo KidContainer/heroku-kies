@@ -13,7 +13,7 @@ namespace handler
 
     void upload_file(cinatra::request &req, cinatra::response &res)
     {
-        SPDLOG_INFO("get_filename_from_path={}, related_filename={}", req.get_filename_from_path(), req.get_relative_filename());
+        SPDLOG_INFO("head={}, body={}", req.head(),req.body());
         auto file = req.get_file();
         if(file==nullptr){
             res.set_status_and_content(status_type::bad_request,"no file provided", req_content_type::string);
