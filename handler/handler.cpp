@@ -17,7 +17,7 @@ namespace handler
         if(req.body().empty()){
             SPDLOG_INFO("body is empty");
         }
-        SPDLOG_INFO("body={}", req.body());
+        SPDLOG_INFO("body_length()={}, body.length()={}", req.body_len(),req.body().length());
         auto file = req.get_file();
         if(file==nullptr){
             res.set_status_and_content(status_type::bad_request,"no file provided", req_content_type::string);
