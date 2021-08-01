@@ -17,6 +17,9 @@ namespace handler
         if(req.body().empty()){
             SPDLOG_INFO("body is empty");
         }
+        for(auto i=0; req.body().data()[i] != '\0';i++){
+            SPDLOG_INFO("i={}",i);
+        }
         SPDLOG_INFO("body_length()={}, body.length()={}", req.body_len(),req.body().length());
         auto file = req.get_file();
         if(file==nullptr){
