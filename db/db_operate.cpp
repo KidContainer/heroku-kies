@@ -21,6 +21,7 @@ namespace db
 
     bool exec(std::string_view sql)
     {
+        SPDLOG_INFO("exec sql={}", sql);
         try
         {
             pqxx::work t(Database::get_conn());
