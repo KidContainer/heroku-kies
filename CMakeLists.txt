@@ -21,6 +21,6 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
 add_executable(heroku_kies main.cpp ${db} ${handler} ${utils})
-target_link_libraries(heroku_kies PRIVATE lib ${CONAN_LIBS})
+target_link_libraries(heroku_kies PRIVATE lib ${CONAN_LIBS} pqxx pq)
 
 install(TARGETS heroku_kies DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/..)
