@@ -15,7 +15,7 @@ namespace db
         if(result.empty()){
             return false;
         }
-        return result[0][0].as<bool>();
+        return true;
     }
 
 
