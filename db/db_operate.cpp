@@ -17,8 +17,9 @@ namespace db
                 return false;
             }
             return true;
-        }catch(std::exception& err){
+        }catch(pqxx::broken_connection& err){
             SPDLOG_ERROR("exception has occured, {}", err.what());
+            return false;
         }
     }
 
