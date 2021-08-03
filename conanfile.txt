@@ -3,6 +3,10 @@ boost/1.75.0
 spdlog/1.9.0
 nlohmann_json/3.9.1
 libpqxx/7.5.2
+libpq/13.3
 
 [generators]
 cmake
+
+[options]
+libpq: with_openssl=True
