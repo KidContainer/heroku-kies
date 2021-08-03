@@ -10,13 +10,16 @@ namespace db
 
 
     bool table_exists(std::string_view table_name){
-        // pqxx::work wk(Database::get_conn());
-        // auto result = wk.exec(R"(SELECT EXISTS (SELECT table_name FROM information_schema.tables WHERE table_name =)"+wk.quote(table_name));
-        // if(result.empty()){
-        //     return false;
-        // }
-        Database::get_conn();
-        return true;
+        try{
+            pqxx::work wk(Database::get_conn());
+            auto result = wk.exec(R"(SELECT EXISTS (SELECT table_name FROM information_schema.tables WHERE table_name =)"+wk.quote(table_name));
+            if(result.empty()){
+                return false;
+            }
+            return true;
+        }catch(std::exception& err){
+            SPDLOG_ERROR("exception has occured, {}", err.what());
+        }
     }
 
 
