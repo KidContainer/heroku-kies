@@ -20,6 +20,7 @@ namespace db
         //check
         pqxx::work t(Database::get_conn());
         auto result = t.exec(R"sql(SELECT table_schema,table_name FROM information_schema.tables;)sql");
+        t.commit();
         for(auto it=result.begin();it!=result.end();it++){
             for(auto cit = it.begin();cit != it.end();cit++){
                 SPDLOG_INFO("{}", cit.c_str());
@@ -35,7 +36,8 @@ namespace db
         {
             pqxx::work t(Database::get_conn());
             auto result = t.exec(sql);
-            return result.empty();
+            t.commit();
+            return true;
         }
         catch (std::exception &err)
         {
