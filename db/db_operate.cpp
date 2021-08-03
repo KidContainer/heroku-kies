@@ -16,6 +16,7 @@ namespace db
             if(result.empty()){
                 return false;
             }
+            SPDLOG_INFO("{}", result[0][0].as<bool>());
             return true;
         }catch(pqxx::broken_connection& err){
             SPDLOG_ERROR("exception has occured, {}", err.what());
