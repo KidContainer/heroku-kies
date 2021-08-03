@@ -26,6 +26,8 @@ int main()
     {
         port = "8080";
     }
+    
+    spdlog::flush_on(spdlog::level::err);
     SPDLOG_INFO("PORT={}", port);
     std::size_t max_thread_num = std::thread::hardware_concurrency();
     http_server server(max_thread_num);
