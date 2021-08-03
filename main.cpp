@@ -4,6 +4,7 @@
 #include "handler/handler.hpp"
 #include "handler/page.hpp"
 #include "utils/file.hpp"
+#include "db/db_operate.hpp"
 using namespace cinatra;
 
 void bind_page(http_server &server)
@@ -14,6 +15,8 @@ void bind_page(http_server &server)
 void bind_api(http_server &server)
 {
     server.set_http_handler<POST>("/api/upload_file", handler::upload_file); //Update file handler
+    server.set_http_handler<GET>("/api/debug_func", handler::debug_func);
+
 }
 
 int main()
@@ -32,8 +35,7 @@ int main()
     bind_page(server);
     bind_api(server);
 
-    server.run();
-
+    server.run();    
 
     return 0;
 }

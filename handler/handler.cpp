@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "../utils/file.hpp"
+#include "../db/db_operate.hpp"
 
 using namespace cinatra;
 
@@ -22,5 +23,12 @@ namespace handler
         res.set_status_and_content(status_type::ok,file->get_file_path(),req_content_type::multipart);
 
     }
+
+
+    void debug_func(cinatra::request &req, cinatra::response &res){
+        SPDLOG_INFO("{}", db::database_init());
+        res.set_status_and_content(status_type::ok,"everything is greet", req_content_type::string);
+    }
+
 
 } // namespace handler
