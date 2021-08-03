@@ -12,7 +12,7 @@ namespace db
     bool table_exists(std::string_view table_name){
         try{
             pqxx::work wk(Database::get_conn());
-            auto result = wk.exec(R"(SELECT EXISTS (SELECT table_name FROM information_schema.tables WHERE table_name =)"+wk.quote(table_name));
+            auto result = wk.exec(R"(SELECT EXISTS (SELECT table_name FROM information_schema.tables WHERE table_name =)"+wk.quote(table_name)+")");
             if(result.empty()){
                 return false;
             }
