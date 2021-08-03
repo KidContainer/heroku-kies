@@ -6,7 +6,7 @@ namespace db
     void database_init()
     {
         //create t_user_info
-        if(auto result = exec(R"sql(CREATE TABLE IF NOT EXISTS t_user_info (
+        if(auto result = exec(R"sql(CREATE TABLE t_user_info (
             id              SERIAL PRIMARY KEY,
             user_name       VARCHAR(200) NOT NULL,
             password        VARCHAR(200) NOT NULL,
@@ -26,6 +26,7 @@ namespace db
         {
             pqxx::work t(Database::get_conn());
             auto result = t.exec(sql);
+            SPDLOG_INFO("result={}", result.size());
             return result.empty();
         }
         catch (std::exception &err)
