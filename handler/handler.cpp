@@ -26,7 +26,6 @@ namespace handler
 
 
     void debug_func(cinatra::request &req, cinatra::response &res){
-        SPDLOG_INFO("{}", db::database_init());
         res.set_status_and_content(status_type::ok,"everything is greet", req_content_type::string);
     }
 
