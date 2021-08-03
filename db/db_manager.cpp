@@ -18,6 +18,7 @@ namespace db
             SPDLOG_ERROR("connection does not open");
             std::terminate();
         }
+        SPDLOG_INFO("connection has established, url={}", psql_str);
         return conn;
     }();
     
