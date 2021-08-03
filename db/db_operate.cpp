@@ -3,26 +3,35 @@
 
 namespace db
 {
-    bool database_init(){
-        //t_user_info
-        return table_exists("t_user_info");
+    void database_init()
+    {
+        //create t_user_info
+        if(auto result = exec(R"sql(CREATE TABLE IF NOT EXISTS user_info (
+            id              SERIAL PRIMARY KEY,
+            user_name       VARCHAR(200) NOT NULL,
+            password        VARCHAR(200) NOT NULL,
+            create_time     INTEGER NOT NULL,
+            last_login      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ))sql"); !result){
+            SPDLOG_ERROR("Error when check if table user_info exists");
+        }
+        
+
     }
 
-
-    bool table_exists(std::string_view table_name){
-        try{
-            pqxx::work wk(Database::get_conn());
-            auto result = wk.exec(fmt::format("(SELECT EXISTS (SELECT table_name FROM information_schema.tables WHERE table_name ={}))",wk.quote(table_name)));
-            if(result.empty()){
-                return false;
-            }
-            SPDLOG_INFO("{}", result[0][0].as<bool>());
+    bool exec(std::string_view sql)
+    {
+        try
+        {
+            pqxx::work t(Database::get_conn());
+            t.exec(sql);
             return true;
-        }catch(pqxx::broken_connection& err){
+        }
+        catch (std::exception &err)
+        {
             SPDLOG_ERROR("exception has occured, {}", err.what());
             return false;
         }
     }
-
 
 } // namespace db
