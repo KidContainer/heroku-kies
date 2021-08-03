@@ -9,4 +9,4 @@ libpq/13.3
 cmake
 
 [options]
-libpq: with_openssl=True
+libpq:with_openssl=True
