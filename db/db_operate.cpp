@@ -15,6 +15,7 @@ namespace db
         // if(result.empty()){
         //     return false;
         // }
+        Database::get_conn();
         return true;
     }
 
