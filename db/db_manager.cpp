@@ -2,9 +2,9 @@
 #include <spdlog/spdlog.h>
 namespace db
 {
-    pqxx::connection& Database::get_conn(){
-        return conn;
-    }
+    // pqxx::connection& Database::get_conn(){
+    //     return conn;
+    // }
 
     //Initialize the connection, if failed, the program should crash
     // thread_local pqxx::connection Database::conn = []() noexcept{
