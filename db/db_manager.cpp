@@ -11,12 +11,13 @@ namespace db
         auto psql_str = std::getenv("DATABASE_URL");
         if(psql_str==nullptr){
             SPDLOG_ERROR("environment variable DATABASE_URL needed");
-            std::terminate();
+            // std::terminate();
         }
-        pqxx::connection conn(psql_str);
-        if(!conn.is_open()){
-            std::terminate();
-        }
+        SPDLOG_INFO("psql_str={}", psql_str);
+        pqxx::connection conn;
+        // if(!conn.is_open()){
+        //     std::terminate();
+        // }
         return conn;
     }();
     
