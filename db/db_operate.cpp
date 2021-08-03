@@ -11,20 +11,14 @@ namespace db
 
     bool table_exists(std::string_view table_name){
         try{
-            auto psql_str = std::getenv("DATABASE_URL");
-            if(psql_str==nullptr){
-                SPDLOG_ERROR("environment variable DATABASE_URL needed");
-                std::terminate();
+            pqxx::work wk(Database::get_conn());
+            auto result = wk.exec(fmt::format("(SELECT EXISTS (SELECT table_name FROM information_schema.tables WHERE table_name ={}))",wk.quote(table_name)));
+            if(result.empty()){
+                return false;
             }
-            pqxx::connection conn{psql_str};
-            if(!conn.is_open()){
-                SPDLOG_ERROR("connection does not open");
-                std::terminate();
-            }
-            SPDLOG_INFO("connection has established, url={}", psql_str);
             return true;
-        }catch(std::exception& err){
-            SPDLOG_ERROR("exception={}", err.what());
+        }catch(pqxx::broken_connection& err){
+            SPDLOG_ERROR("exception has occured, {}", err.what());
             return false;
         }
     }
