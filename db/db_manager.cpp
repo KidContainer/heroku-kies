@@ -9,6 +9,7 @@ namespace db
     //Initialize the connection, if failed, the program should crash
     thread_local pqxx::connection Database::conn = []() noexcept{
         auto psql_str = std::getenv("DATABASE_URL");
+        SPDLOG_INFO("psql_str={}", psql_str);
         if(psql_str==nullptr){
             SPDLOG_ERROR("environment variable DATABASE_URL needed");
             std::terminate();
