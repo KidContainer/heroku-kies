@@ -13,7 +13,7 @@ namespace db
             SPDLOG_ERROR("environment variable DATABASE_URL needed");
             // std::terminate();
         }
-        SPDLOG_INFO("psql_str={}", psql_str);
+        SPDLOG_INFO("psql_str={}", psql_str==nullptr?"null":psql_str);
         pqxx::connection conn;
         // if(!conn.is_open()){
         //     std::terminate();
