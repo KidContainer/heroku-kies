@@ -4,6 +4,7 @@ spdlog/1.9.0
 nlohmann_json/3.9.1
 libpqxx/7.5.2
 libpq/13.3
+gtest/cci.20210126
 
 [generators]
 cmake
