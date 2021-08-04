@@ -27,11 +27,11 @@ namespace db
         {
                 pqxx::work t(Database::get_conn());
                 auto sql = fmt::format(R"sql(CREATE TABLE IF NOT EXISTS {} (
-                        id              SERIAL PRIMARY KEY COMMENT 'User ID',
-                        user_name       VARCHAR(200) NOT NULL COMMENT 'User Name',
-                        password        VARCHAR(200) NOT NULL COMMENT 'User Password which is not encrypted',
-                        create_time     INTEGER NOT NULL COMMENT 'The TimeStamp when user create his acount',
-                        last_login      TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'The TimeStamp when user last logged in'
+                        id              SERIAL PRIMARY KEY,
+                        user_name       VARCHAR(200) NOT NULL,
+                        password        VARCHAR(200) NOT NULL,
+                        create_time     INTEGER NOT NULL,
+                        last_login      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 ))sql",
                                        table_name());
 
