@@ -6,9 +6,11 @@ TEST(ANY_TEST, ANY_TEST_1)
 {
     using ::testing::HasSubstr;
     using ::testing::MatchesRegex;
+    using namespace std;
 
     EXPECT_EQ("123", utils::any_to_string(123));
-    EXPECT_EQ("hello", utils::any_to_string("hello"));
+    EXPECT_EQ("'hello'", utils::any_to_string("hello"));
+    EXPECT_EQ("'hello'", utils::any_to_string("hello"s));
     EXPECT_EQ("true", utils::any_to_string(true));
     EXPECT_EQ("false", utils::any_to_string(false));
     EXPECT_THAT(utils::any_to_string(1.2),HasSubstr("unsupported type"));

@@ -49,9 +49,17 @@ namespace utils
             to_any_visitor<bool>([](bool x)
                                  { return x ? "true" : "false"; }),
             to_any_visitor<std::string>([](std::string x)
-                                        { return x; }),
-            to_any_visitor<char const *>([](char const *s)
-                                         { return s; }),
+                                        {
+                                            std::stringstream ss;
+                                            ss << std::quoted(x, '\'');
+                                            return ss.str();
+                                        }),
+            to_any_visitor<char const *>([](char const *x)
+                                         {
+                                             std::stringstream ss;
+                                             ss << std::quoted(x, '\'');
+                                             return ss.str();
+                                         }),
         };
 
     std::string any_to_string(const std::any &any)

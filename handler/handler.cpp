@@ -6,6 +6,8 @@
 
 #include "../utils/file.hpp"
 #include "../db/db_operate.hpp"
+#include "../db/t_user_info.hpp"
+#include "../db/db_manager.hpp"
 
 using namespace cinatra;
 
@@ -31,6 +33,11 @@ namespace handler
         }else{
             SPDLOG_INFO("head={}, body={}", req.head(), req.body());
         }
+        auto user_name = req.get_query_value("user_name");
+        auto password = req.get_query_value("password");
+        auto create_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        auto result = db::t_user_info::insert({{"user_name",user_name},{"password",password},{"create_time",create_time}});
+        db::Database::print_result(result);
         res.set_status_and_content(status_type::ok,"everything is greet", req_content_type::string);
     }
 

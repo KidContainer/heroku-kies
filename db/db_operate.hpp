@@ -9,10 +9,6 @@ namespace db
     //Check if the table has been created and create one if it's not
     void database_init();
 
-
-    //Excute one sql without caring about the result
-    bool exec(std::string_view sql);
-
 } // namespace db
 
 
