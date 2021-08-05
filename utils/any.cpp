@@ -60,6 +60,8 @@ namespace utils
                                              ss << std::quoted(x, '\'');
                                              return ss.str();
                                          }),
+            to_any_visitor<std::string_view>([](std::string_view x)
+                                             { return std::string(x); }),
         };
 
     std::string any_to_string(const std::any &any)
