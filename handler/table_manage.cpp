@@ -40,7 +40,7 @@ namespace handler
             SPDLOG_WARN("Request does not contains op_type");
             nlohmann::json data;
             data["op_type_enum"] = {"insert", "remove", "fetch", "update", "insert_multi"};
-            res.set_status_and_content(status_type::ok, utils::resp(10001, "op_type is needed", data.dump()), req_content_type::json);
+            res.set_status_and_content(status_type::ok, utils::resp(10001, "op_type is needed", data), req_content_type::json);
             return;
         }
 

@@ -3,10 +3,10 @@
 
 #include <string>
 #include <string_view>
-
+#include <nlohmann/json.hpp>
 namespace utils
 {
-    std::string resp(int status_code, std::string_view status_message, std::string_view data="");
+    std::string resp(int status_code, std::string_view status_message, nlohmann::json data="{}"_json);
 } // namespace utils
 
 
