@@ -14,8 +14,6 @@ namespace handler
         SPDLOG_INFO("operation for t_user_info, ip={}", req.get_header_value("X-Forwarded-For"));
         
         //content type check
-        auto content_type = req.get_header_value("content-type");
-        SPDLOG_INFO("content-type={}", content_type);
         if(req.get_content_type() != content_type::string){
             SPDLOG_WARN("Unsupported ContentType, which is {}", req.get_content_type());
             res.set_status_and_content(status_type::ok, "unsupported Content-Type", req_content_type::string);
@@ -23,7 +21,7 @@ namespace handler
         }
 
         //json valid check
-        if(nlohmann::json::accept(req.body())){
+        if(!nlohmann::json::accept(req.body())){
             SPDLOG_WARN("Request body is not a valid json, it's {}", req.body());
             res.set_status_and_content(status_type::ok, "it's not a valid json", req_content_type::string);
             return;
