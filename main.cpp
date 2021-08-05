@@ -3,6 +3,8 @@
 #include <spdlog/spdlog.h>
 #include "handler/handler.hpp"
 #include "handler/page.hpp"
+#include "handler/table_manage.hpp"
+
 #include "utils/file.hpp"
 #include "db/db_operate.hpp"
 
