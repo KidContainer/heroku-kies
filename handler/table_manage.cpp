@@ -1,5 +1,6 @@
 #include "table_manage.hpp"
 #include <spdlog/spdlog.h>
+#include <string>
 #include <nlohmann/json.hpp>
 
 #include "../db/db_operate.hpp"
@@ -35,7 +36,7 @@ namespace handler
         nlohmann::json request = nlohmann::json::parse(req.body());
 
         // get op type
-        if (!request.contains("op_type"))
+        if (!request.contains("op_type") || !request["op_type"].is_string())
         {
             SPDLOG_WARN("Request does not contains op_type");
             nlohmann::json data;
@@ -45,9 +46,32 @@ namespace handler
         }
 
         auto op_type = request.value("op_type", "none");
-        SPDLOG_INFO("op_type is {}", op_type);
+        if(op_type == "insert"){
+            //Get the parameter
+            auto user_name = req.get_query_value("user_name");
+            auto password = req.get_query_value("password");
 
-        res.set_status_and_content(status_type::ok);
+            //Check validation
+            if(user_name.empty() || password.empty()){
+                SPDLOG_INFO("user name or password is empty, user_name={}, password={}",user_name, password);
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name or password is empty"), req_content_type::json);
+                return;
+            }
+
+            //Check if the name has been occupied
+            bool exist = false;
+            std::tie(std::ignore, exist) = db::t_user_info::fetch_first({{"user_name",user_name}});
+            if(exist){
+                SPDLOG_INFO("user name '{}' has been registered", user_name);
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "user name has been occupied"), req_content_type::json);
+                return;
+            }
+
+            //Insert
+            auto result = db::t_user_info::insert({{"user_name",user_name},{"password", password}});
+            SPDLOG_INFO("result={}", db::Database::print_result(result));
+        }    
+        res.set_status_and_content(status_type::ok, utils::resp(), req_content_type::json);
     }
 
 } // namespace handler
