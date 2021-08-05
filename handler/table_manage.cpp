@@ -8,6 +8,7 @@
 #include "../db/db_manager.hpp"
 
 #include "../utils/helper.hpp"
+#include "../utils/time.hpp"
 
 using namespace cinatra;
 
