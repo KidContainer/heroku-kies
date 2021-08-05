@@ -65,7 +65,7 @@ namespace handler
             bool exist = false;
             std::tie(std::ignore, exist) = db::t_user_info::fetch_first({{"user_name",request["user_name"].get<std::string>()}});
             if(exist){
-                SPDLOG_INFO("user name '{}' has been registered", user_name);
+                SPDLOG_INFO("user name '{}' has been registered", request["user_name"].get<std::string>());
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "user name has been occupied"), req_content_type::json);
                 return;
             }
