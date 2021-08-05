@@ -36,7 +36,7 @@ namespace handler
         nlohmann::json request = nlohmann::json::parse(req.body());
 
         // get op type
-        if (!request.contains("op_type") || !request["op_type"].is_string())
+        if (!request["op_type"].is_string())
         {
             SPDLOG_WARN("Request does not contains op_type");
             nlohmann::json data;
@@ -54,13 +54,6 @@ namespace handler
                 return;
             }
 
-            //Check validation
-            // if(user_name.empty() || password.empty()){
-            //     SPDLOG_INFO("user name or password is empty, user_name={}, password={}",user_name, password);
-            //     res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name or password is empty"), req_content_type::json);
-            //     return;
-            // }
-
             //Check if the name has been occupied
             bool exist = false;
             std::tie(std::ignore, exist) = db::t_user_info::fetch_first({{"user_name",request["user_name"].get<std::string>()}});
@@ -71,7 +64,10 @@ namespace handler
             }
 
             //Insert
-            auto result = db::t_user_info::insert({{"user_name",request["user_name"].get<std::string>()},{"password", request["password"].get<std::string>()}});
+            auto result = db::t_user_info::insert({
+                {"user_name",request["user_name"].get<std::string>()},
+                {"password", request["password"].get<std::string>()},
+                {"create_time", utils::now()}});
             SPDLOG_INFO("result={}", db::Database::print_result(result));
         }    
         res.set_status_and_content(status_type::ok, utils::resp(), req_content_type::json);
