@@ -48,19 +48,22 @@ namespace handler
         auto op_type = request.value("op_type", "none");
         if(op_type == "insert"){
             //Get the parameter
-            auto user_name = req.get_query_value("user_name");
-            auto password = req.get_query_value("password");
-
-            //Check validation
-            if(user_name.empty() || password.empty()){
-                SPDLOG_INFO("user name or password is empty, user_name={}, password={}",user_name, password);
-                res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name or password is empty"), req_content_type::json);
+            if(!request["user_name"].is_string() || !request["user_name"].is_string()){
+                SPDLOG_INFO("user_name or password is not string");
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name or password is not string"), req_content_type::json);
                 return;
             }
 
+            //Check validation
+            // if(user_name.empty() || password.empty()){
+            //     SPDLOG_INFO("user name or password is empty, user_name={}, password={}",user_name, password);
+            //     res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name or password is empty"), req_content_type::json);
+            //     return;
+            // }
+
             //Check if the name has been occupied
             bool exist = false;
-            std::tie(std::ignore, exist) = db::t_user_info::fetch_first({{"user_name",user_name}});
+            std::tie(std::ignore, exist) = db::t_user_info::fetch_first({{"user_name",request["user_name"].get<std::string>()}});
             if(exist){
                 SPDLOG_INFO("user name '{}' has been registered", user_name);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "user name has been occupied"), req_content_type::json);
@@ -68,7 +71,7 @@ namespace handler
             }
 
             //Insert
-            auto result = db::t_user_info::insert({{"user_name",user_name},{"password", password}});
+            auto result = db::t_user_info::insert({{"user_name",request["user_name"].get<std::string>()},{"password", request["password"].get<std::string>()}});
             SPDLOG_INFO("result={}", db::Database::print_result(result));
         }    
         res.set_status_and_content(status_type::ok, utils::resp(), req_content_type::json);
