@@ -28,7 +28,7 @@ namespace handler
 
 
     void debug_func(cinatra::request &req, cinatra::response &res){
-        if(req.get_content_type() != content_type::multipart){
+        if(req.get_content_type() == content_type::multipart){
             SPDLOG_INFO("multipart");
         }else{
             SPDLOG_INFO("head={}, body={}", req.head(), req.body());
