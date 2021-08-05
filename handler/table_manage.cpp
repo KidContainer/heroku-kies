@@ -48,7 +48,7 @@ namespace handler
         auto op_type = request.value("op_type", "none");
         if(op_type == "insert"){
             //Get the parameter
-            if(!request["user_name"].is_string() || !request["user_name"].is_string()){
+            if(!request["user_name"].is_string() || !request["password"].is_string()){
                 SPDLOG_INFO("user_name or password is not string");
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name or password is not string"), req_content_type::json);
                 return;
