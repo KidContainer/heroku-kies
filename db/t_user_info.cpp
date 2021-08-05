@@ -34,7 +34,7 @@ namespace db
                         password        VARCHAR(200) NOT NULL,
                         create_time     INTEGER NOT NULL,
                         last_login      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        email           VARCHAR(100) DEFAULT "",
+                        email           VARCHAR(100) DEFAULT "[no email]",
                         profile         VARCHAR(300) DEFAULT "/img/profile/default_profile.jpeg"
                 ))sql",
                                        table_name());
