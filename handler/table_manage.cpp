@@ -13,10 +13,14 @@ namespace handler
     void t_user_info_op(request &req, response &res){
         SPDLOG_INFO("operation for t_user_info, ip={}", req.get_header_value("X-Forwarded-For"));
         
+        nlohmann::json resp;
+
         //content type check
         if(req.get_content_type() != content_type::string){
             SPDLOG_WARN("Unsupported ContentType, which is {}", req.get_content_type());
-            res.set_status_and_content(status_type::ok, "unsupported Content-Type", req_content_type::string);
+            resp["status_code"] = 10001;
+            resp["status_message"] = "unsupported Content-Type";
+            res.set_status_and_content(status_type::ok, resp.dump(), req_content_type::json);
             return;
         }
 
