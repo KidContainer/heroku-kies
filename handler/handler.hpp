@@ -6,8 +6,6 @@
 namespace handler
 {
     void upload_file(cinatra::request &req, cinatra::response &res);
-
-    void debug_func(cinatra::request &req, cinatra::response &res);
 } // namespace handler
 
 #endif

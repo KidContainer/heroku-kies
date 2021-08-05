@@ -20,6 +20,8 @@ namespace db
                     .password = res["password"].as<std::string>(),
                     .create_time = res["create_time"].as<std::int64_t>(),
                     .last_login = res["last_login"].as<std::int64_t>(),
+                    .email = res["email"].as<std::string>(),
+                    .profile = res["profile"].as<std::string>(),
                 };
         }
 
@@ -28,10 +30,12 @@ namespace db
                 pqxx::work t(Database::get_conn());
                 auto sql = fmt::format(R"sql(CREATE TABLE IF NOT EXISTS {} (
                         id              SERIAL PRIMARY KEY,
-                        user_name       VARCHAR(200) NOT NULL,
+                        user_name       VARCHAR(200) NOT NULL UNIQUE,
                         password        VARCHAR(200) NOT NULL,
                         create_time     INTEGER NOT NULL,
-                        last_login      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                        last_login      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        email           VARCHAR(100) DEFAULT "",
+                        profile         VARCHAR(300) DEFAULT "/img/profile/default_profile.jpeg"
                 ))sql",
                                        table_name());
 

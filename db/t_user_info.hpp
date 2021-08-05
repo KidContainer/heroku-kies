@@ -17,6 +17,8 @@ namespace db
         std::string password;
         std::int64_t create_time;
         std::int64_t last_login;
+        std::string email;
+        std::string profile;
 
         private:
         static t_user_info row_to_user_info(pqxx::row res);
