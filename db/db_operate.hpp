@@ -2,8 +2,6 @@
 #define DB_DB_OPERATE_HPP
 
 #include <string_view>
-#include <spdlog/spdlog.h>
-
 namespace db
 {
     //Check if the table has been created and create one if it's not

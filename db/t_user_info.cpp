@@ -1,7 +1,8 @@
 #include "t_user_info.hpp"
 #include "db_manager.hpp"
-#include <spdlog/spdlog.h>
+// #include <spdlog/spdlog.h>
 #include "../utils/any.hpp"
+#include <fmt/format.h>
 
 #include <vector>
 
@@ -39,7 +40,7 @@ namespace db
                 ))sql",
                                        table_name());
 
-                SPDLOG_INFO("sql={}", sql);
+                // SPDLOG_INFO("sql={}", sql);
                 auto result = t.exec(sql, "[CREATE TABLE]");
                 t.commit();
                 return result;
@@ -68,7 +69,7 @@ namespace db
                                 sep = " AND ";
                         }
                 }
-                SPDLOG_INFO("sql={}", ss.str());
+                // SPDLOG_INFO("sql={}", ss.str());
                 auto result = t.exec(ss.str(), "[FETCH]");
                 t.commit();
 
@@ -98,7 +99,7 @@ namespace db
                 }
                 ss << " LIMIT 1";
 
-                SPDLOG_INFO("sql={}", ss.str());
+                // SPDLOG_INFO("sql={}", ss.str());
                 auto result = t.exec(ss.str(), "[FETCH FIRST]");
                 t.commit();
                 if (result.size() == 1)
@@ -128,7 +129,7 @@ namespace db
                         ss << " LIMIT " << limit;
                 }
 
-                SPDLOG_INFO("sql={}", ss.str());
+                // SPDLOG_INFO("sql={}", ss.str());
                 auto result = t.exec(ss.str(), "[REMOVE]");
                 t.commit();
                 return result;
@@ -154,7 +155,7 @@ namespace db
                         ss<<sep<<item.first<<"="<<t.quote(utils::any_to_string(item.second));
                         sep = " AND ";
                 }
-                SPDLOG_INFO("sql={}",ss.str());
+                // SPDLOG_INFO("sql={}",ss.str());
                 auto result = t.exec(ss.str(), "[UPDATE]");
                 t.commit();
                 return result;
@@ -180,7 +181,7 @@ namespace db
                         sep=", ";
                 }
                 ss<<")";
-                SPDLOG_INFO("sql={}",ss.str());
+                // SPDLOG_INFO("sql={}",ss.str());
                 auto result = t.exec(ss.str(),"[INSERT]");
                 t.commit();
                 return result;
@@ -211,7 +212,7 @@ namespace db
                         ss<<")";
                         sep=", ";
                 }
-                SPDLOG_INFO("sql={}", ss.str());
+                // SPDLOG_INFO("sql={}", ss.str());
                 auto result = t.exec(ss.str(),"[BATCH INSERT]");
                 t.commit();
                 return result;
