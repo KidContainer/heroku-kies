@@ -2,7 +2,6 @@
 #define DB_DB_OPERATE_HPP
 
 #include <string_view>
-#include <spdlog/spdlog.h>
 
 namespace db
 {
