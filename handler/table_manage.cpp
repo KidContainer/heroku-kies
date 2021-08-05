@@ -27,7 +27,9 @@ namespace handler
         //json valid check
         if(!nlohmann::json::accept(req.body())){
             SPDLOG_WARN("Request body is not a valid json, it's {}", req.body());
-            res.set_status_and_content(status_type::ok, "it's not a valid json", req_content_type::string);
+            resp["status_code"] = 10001;
+            resp["status_message"] = "it's not a valid json";
+            res.set_status_and_content(status_type::ok, resp.dump(), req_content_type::json);
             return;
         }
 
@@ -36,14 +38,20 @@ namespace handler
         // get op type
         if(!request.contains("op_type")){
             SPDLOG_WARN("Request does not contains op_type");
-            res.set_status_and_content(status_type::ok, "op_type is needed", req_content_type::string);
+            resp["status_code"] = 10001;
+            resp["status_message"] = "op_type is needed";
+            resp["op_type_enum"] = {"insert","remove","fetch","update","insert_multi"};
+            res.set_status_and_content(status_type::ok, resp.dump(), req_content_type::json);
             return;
         }
 
 
         auto op_type = request.value("op_type","none");
         SPDLOG_INFO("op_type is {}", op_type);
-        res.set_status_and_content(status_type::ok, "inserting succeed", req_content_type::string);
+
+        resp["status_code"] = 0;
+        resp["status_message"] = "";
+        res.set_status_and_content(status_type::ok, resp.dump(), req_content_type::json);
     }
 
 } // namespace handler
