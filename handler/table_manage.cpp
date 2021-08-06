@@ -77,6 +77,9 @@ namespace handler
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "insert failed"), req_content_type::json);
                 return;
             }
+
+            res.set_status_and_content(status_type::ok, utils::resp(), req_content_type::json);
+            return;
         }
         else if (op_type == "remove")
         {
@@ -97,6 +100,9 @@ namespace handler
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "failed to remove"), req_content_type::json);
                 return;
             }
+
+            res.set_status_and_content(status_type::ok, utils::resp(), req_content_type::json);
+            return;
         }else if(op_type=="fetch"){
             //Get the parameter
             if(!utils::all_string(request, {"user_name"})){
