@@ -19,7 +19,7 @@ namespace db
                     .user_name = res["user_name"].as<std::string>(),
                     .password = res["password"].as<std::string>(),
                     .create_time = res["create_time"].as<std::int64_t>(),
-                    .last_login = res["last_login"].as<std::int64_t>(),
+                    .last_login = res["last_login"].as<std::string>(),
                     .email = res["email"].as<std::string>(),
                     .profile = res["profile"].as<std::string>(),
                 };

@@ -16,7 +16,7 @@ namespace db
         std::string user_name;
         std::string password;
         std::int64_t create_time;
-        std::int64_t last_login;
+        std::string last_login;
         std::string email;
         std::string profile;
 
