@@ -37,7 +37,7 @@ namespace handler
         nlohmann::json request = nlohmann::json::parse(req.body());
 
         // get op type
-        if (!request["op_type"].is_string())
+        if (!utils::all_string(request, {"op_type"}))
         {
             SPDLOG_WARN("Request does not contains op_type");
             nlohmann::json data;
@@ -49,7 +49,7 @@ namespace handler
         auto op_type = request.value("op_type", "none");
         if(op_type == "insert"){
             //Get the parameter
-            if(!request["user_name"].is_string() || !request["password"].is_string()){
+            if(!utils::all_string(request,{"user_name","password"})){
                 SPDLOG_INFO("user_name or password is not string");
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name or password is not string"), req_content_type::json);
                 return;
