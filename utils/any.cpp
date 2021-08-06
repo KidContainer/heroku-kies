@@ -5,6 +5,8 @@
 #include <functional>
 #include <iomanip>
 
+#include <spdlog/spdlog.h>
+
 namespace utils
 {
 
@@ -50,18 +52,23 @@ namespace utils
                                  { return x ? "true" : "false"; }),
             to_any_visitor<std::string>([](std::string x)
                                         {
+                                            SPDLOG_INFO("1");
                                             std::stringstream ss;
                                             ss << std::quoted(x, '\'');
                                             return ss.str();
                                         }),
             to_any_visitor<char const *>([](char const *x)
                                          {
+                                             SPDLOG_INFO("2");
                                              std::stringstream ss;
                                              ss << std::quoted(x, '\'');
                                              return ss.str();
                                          }),
             to_any_visitor<std::string_view>([](std::string_view x)
-                                             { return std::string(x); }),
+                                             {
+                                                 SPDLOG_INFO("3");
+                                                 return std::string(x);
+                                             }),
         };
 
     std::string any_to_string(const std::any &any)
