@@ -69,9 +69,9 @@ namespace handler
                 {"user_name",request["user_name"].get<std::string>()},
                 {"password", request["password"].get<std::string>()},
                 {"create_time", utils::now()}});
-            if(result.affected_rows()==1){
-                SPDLOG_INFO("insert success");
-                res.set_status_and_content(status_type::ok, utils::resp(), req_content_type::json);
+            if(result.affected_rows()==0){
+                SPDLOG_INFO("insert failed");
+                res.set_status_and_content(status_type::ok, utils::resp(10001,"insert failed"), req_content_type::json);
                 return;
             }
         }else if(op_type == "remove"){
@@ -81,10 +81,15 @@ namespace handler
                 res.set_status_and_content(status_type::ok, utils::resp(10001,"user_name is missing"), req_content_type::json);
                 return;
             }
-            auto user_name = request[]
+            auto user_name = request["user_name"].get<std::string>();
 
             //Remove the user_name
-            auto result = db::t_user_info::remove({"user_name",})
+            auto result = db::t_user_info::remove({{"user_name",user_name}}, 1);
+            if(result.affected_rows() == 0){
+                SPDLOG_INFO("failed to remove");
+                res.set_status_and_content(status_type::ok, utils::resp(10001,"failed to remove"),req_content_type::json);
+                return;
+            }
 
         }
         res.set_status_and_content(status_type::ok, utils::resp(), req_content_type::json);

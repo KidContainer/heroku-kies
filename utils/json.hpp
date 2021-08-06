@@ -6,7 +6,7 @@
 #include <nlohmann/json.hpp>
 namespace utils
 {
-    std::string resp(int status_code=0, std::string_view status_message="", nlohmann::json data="{}"_json);
+    std::string resp(int status_code=0, std::string_view status_message="", nlohmann::json data=nlohmann::json());
 
     bool all_string(const nlohmann::json& data, std::initializer_list<std::string> names);
 
