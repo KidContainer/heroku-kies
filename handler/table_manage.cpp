@@ -81,7 +81,7 @@ namespace handler
         else if (op_type == "remove")
         {
             //Get the parameter
-            if (utils::all_string(request, {"user_name"}))
+            if (!utils::all_string(request, {"user_name"}))
             {
                 SPDLOG_INFO("user_name is missing");
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name is missing"), req_content_type::json);
