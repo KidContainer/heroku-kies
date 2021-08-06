@@ -69,7 +69,7 @@ namespace handler
                 {"user_name",request["user_name"].get<std::string>()},
                 {"password", request["password"].get<std::string>()},
                 {"create_time", utils::now()}});
-            SPDLOG_INFO("result={}", db::Database::print_result(result));
+            SPDLOG_INFO("result={}", result.affected_rows());
         }    
         res.set_status_and_content(status_type::ok, utils::resp(), req_content_type::json);
     }
