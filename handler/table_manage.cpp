@@ -101,7 +101,7 @@ namespace handler
             //Get the parameter
             if(!utils::all_string(request, {"user_name"})){
                 SPDLOG_INFO("user_name is missing");
-                res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name is missing"));
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name is missing"), req_content_type::json);
                 return;
             }
 
@@ -110,7 +110,7 @@ namespace handler
             auto [user_info, exist] = db::t_user_info::fetch_first({{"user_name", user_name}});
             if(!exist){
                 SPDLOG_INFO("user {} does not exist", user_name);
-                res.set_status_and_content(status_type::ok, utils::resp(10001, fmt::format("user {} does not exist", user_name)));
+                res.set_status_and_content(status_type::ok, utils::resp(10001, fmt::format("user {} does not exist", user_name)), req_content_type::json);
                 return;
             }
             nlohmann::json result;
