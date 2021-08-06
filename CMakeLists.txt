@@ -14,7 +14,10 @@ add_compile_options(-fsanitize=address -g)
 add_link_options(-fsanitize=address)
 
 add_subdirectory(lib)
-add_subdirectory(utils)
+
+if(NOT SKIP_TEST)
+    add_subdirectory(utils)
+endif()
 
 function(add_all_source src_files)
     aux_source_directory(${src_files} ${src_files})

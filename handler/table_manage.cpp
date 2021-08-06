@@ -46,7 +46,7 @@ namespace handler
             return;
         }
 
-        auto op_type = request.value("op_type","none");
+        auto op_type = request["op_type"].get<std::string>();
         if(op_type == "insert"){
             //Get the parameter
             if(!utils::all_string(request,{"user_name","password"})){
