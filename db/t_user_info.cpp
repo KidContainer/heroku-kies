@@ -108,7 +108,7 @@ namespace db
                 return {t_user_info{}, false};
         }
 
-        pqxx::result t_user_info::remove(std::unordered_map<std::string_view, std::any> condition, int limit)
+        pqxx::result t_user_info::remove(std::unordered_map<std::string_view, std::any> condition)
         {
                 pqxx::work t(Database::get_conn());
                 std::stringstream ss;
@@ -122,10 +122,6 @@ namespace db
                                 ss << sep << item.first << "=" << t.quote(utils::any_to_string(item.second));
                                 sep = " AND ";
                         }
-                }
-                if (limit != 0)
-                {
-                        ss << " LIMIT " << limit;
                 }
 
                 SPDLOG_INFO("sql={}", ss.str());

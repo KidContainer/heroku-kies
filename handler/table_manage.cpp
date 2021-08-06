@@ -90,7 +90,7 @@ namespace handler
             auto user_name = request["user_name"].get<std::string>();
 
             //Remove the user_name
-            auto result = db::t_user_info::remove({{"user_name", user_name}}, 1);
+            auto result = db::t_user_info::remove({{"user_name", user_name}});
             if (result.affected_rows() == 0)
             {
                 SPDLOG_INFO("failed to remove");

@@ -35,7 +35,7 @@ namespace db
 
         static std::tuple<t_user_info,bool> fetch_first(std::unordered_map<std::string_view, std::any> condition);
 
-        static pqxx::result remove(std::unordered_map<std::string_view, std::any> condition, int limit);
+        static pqxx::result remove(std::unordered_map<std::string_view, std::any> condition);
 
         static pqxx::result update(std::unordered_map<std::string_view, std::any> condition, std::unordered_map<std::string_view, std::any> value, int limit=0);
 
