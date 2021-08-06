@@ -46,7 +46,7 @@ namespace handler
             return;
         }
 
-        auto op_type = request.value("op_type", "none");
+        auto op_type = request.value("op_type","none");
         if(op_type == "insert"){
             //Get the parameter
             if(!utils::all_string(request,{"user_name","password"})){
@@ -69,8 +69,24 @@ namespace handler
                 {"user_name",request["user_name"].get<std::string>()},
                 {"password", request["password"].get<std::string>()},
                 {"create_time", utils::now()}});
-            SPDLOG_INFO("result={}", result.affected_rows());
-        }    
+            if(result.affected_rows()==1){
+                SPDLOG_INFO("insert success");
+                res.set_status_and_content(status_type::ok, utils::resp(), req_content_type::json);
+                return;
+            }
+        }else if(op_type == "remove"){
+            //Get the parameter
+            if(utils::all_string(request,{"user_name"})){
+                SPDLOG_INFO("user_name is missing");
+                res.set_status_and_content(status_type::ok, utils::resp(10001,"user_name is missing"), req_content_type::json);
+                return;
+            }
+            auto user_name = request[]
+
+            //Remove the user_name
+            auto result = db::t_user_info::remove({"user_name",})
+
+        }
         res.set_status_and_content(status_type::ok, utils::resp(), req_content_type::json);
     }
 
