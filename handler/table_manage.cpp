@@ -68,9 +68,13 @@ namespace handler
             }
 
             //Insert
-            auto result = db::t_user_info::insert({{"user_name", request["user_name"].get<std::string>()},
-                                                   {"password", request["password"].get<std::string>()},
-                                                   {"create_time", utils::now()}});
+            std::map<std::string_view, std::any> data = {{"user_name", request["user_name"].get<std::string>()},
+                                                                   {"password", request["password"].get<std::string>()},
+                                                                   {"create_time", utils::now()}};
+            if(utils::all_string(request, {"profile"})){
+                data.insert({"profile",request["profile"].get<std::string>()});
+            }
+            auto result = db::t_user_info::insert(data);
             if (result.affected_rows() == 0)
             {
                 SPDLOG_INFO("insert failed");
@@ -103,9 +107,12 @@ namespace handler
 
             res.set_status_and_content(status_type::ok, utils::resp(), req_content_type::json);
             return;
-        }else if(op_type=="fetch"){
+        }
+        else if (op_type == "fetch")
+        {
             //Get the parameter
-            if(!utils::all_string(request, {"user_name"})){
+            if (!utils::all_string(request, {"user_name"}))
+            {
                 SPDLOG_INFO("user_name is missing");
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name is missing"), req_content_type::json);
                 return;
@@ -114,7 +121,8 @@ namespace handler
             //Get the result
             auto user_name = request["user_name"].get<std::string>();
             auto [user_info, exist] = db::t_user_info::fetch_first({{"user_name", user_name}});
-            if(!exist){
+            if (!exist)
+            {
                 SPDLOG_INFO("user {} does not exist", user_name);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, fmt::format("user {} does not exist", user_name)), req_content_type::json);
                 return;
@@ -125,8 +133,8 @@ namespace handler
             result["last_login"] = user_info.last_login;
             result["email"] = user_info.email;
             result["profile"] = user_info.profile;
-            
-            res.set_status_and_content(status_type::ok, utils::resp(0,"",result), req_content_type::json);
+
+            res.set_status_and_content(status_type::ok, utils::resp(0, "", result), req_content_type::json);
             return;
         }
         res.set_status_and_content(status_type::ok, utils::resp(10001, "op_type is not supported"), req_content_type::json);

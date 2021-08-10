@@ -1,0 +1,29 @@
+{
+  "name": "heroku-kies",
+  "version": "1.0.0",
+  "description": "The front end of heroku-kies",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KieQ/heroku-kies.git"
+  },
+  "author": "kie",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KieQ/heroku-kies/issues"
+  },
+  "homepage": "https://github.com/KieQ/heroku-kies#readme",
+  "devDependencies": {
+    "clean-webpack-plugin": "^4.0.0-alpha.0",
+    "html-webpack-plugin": "^5.3.2",
+    "mini-css-extract-plugin": "^2.2.0",
+    "webpack": "^5.49.0",
+    "webpack-cli": "^4.7.2"
+  }
+}
