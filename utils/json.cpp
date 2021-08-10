@@ -48,7 +48,7 @@ namespace utils
 
     std::string get_string(const nlohmann::json &data, std::string name, std::string default_value)
     {
-        if (data.contains(name) && data.is_string())
+        if (data.contains(name) && data[name].is_string())
         {
             return data[name].get<std::string>();
         }
@@ -57,7 +57,7 @@ namespace utils
 
     long long get_number(const nlohmann::json &data, std::string name, long long default_value)
     {
-        if (data.contains(name) && data.is_number())
+        if (data.contains(name) && data[name].is_number())
         {
             return data[name].get<long long>();
         }
@@ -66,7 +66,7 @@ namespace utils
 
     int get_integer(const nlohmann::json &data, std::string name, int default_value)
     {
-        if (data.contains(name) && data.is_number_integer())
+        if (data.contains(name) && data[name].is_number_integer())
         {
             return data[name].get<int>();
         }
@@ -75,7 +75,7 @@ namespace utils
 
     double get_float(const nlohmann::json &data, std::string name, double default_value)
     {
-        if (data.contains(name) && data.is_number_float())
+        if (data.contains(name) && data[name].is_number_float())
         {
             return data[name].get<double>();
         }
@@ -84,7 +84,7 @@ namespace utils
 
     bool all_boolean(const nlohmann::json &data, std::string name, bool default_value)
     {
-        if (data.contains(name) && data.is_boolean())
+        if (data.contains(name) && data[name].is_boolean())
         {
             return data[name].get<bool>();
         }
