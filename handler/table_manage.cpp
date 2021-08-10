@@ -46,7 +46,7 @@ namespace handler
             return;
         }
 
-        auto op_type = request["op_type"].get<std::string>();
+        const auto op_type = request["op_type"].get<std::string>();
         if (op_type == "insert")
         {
             //Get the parameter
@@ -69,10 +69,15 @@ namespace handler
 
             //Insert
             std::map<std::string_view, std::any> data = {{"user_name", request["user_name"].get<std::string>()},
-                                                                   {"password", request["password"].get<std::string>()},
-                                                                   {"create_time", utils::now()}};
-            if(utils::all_string(request, {"profile"})){
-                data.insert({"profile",request["profile"].get<std::string>()});
+                                                         {"password", request["password"].get<std::string>()},
+                                                         {"create_time", utils::now()}};
+            if (auto profile = utils::get_string(request, "profile", ""); profile != "")
+            {
+                data.insert({"profile", profile});
+            }
+            if (auto email = utils::get_string(request, "email", ""); email != "")
+            {
+                data.insert({"email", email});
             }
             auto result = db::t_user_info::insert(data);
             if (result.affected_rows() == 0)
@@ -88,13 +93,13 @@ namespace handler
         else if (op_type == "remove")
         {
             //Get the parameter
-            if (!utils::all_string(request, {"user_name"}))
+            std::string user_name = "";
+            if (user_name = utils::get_string(request, "user_name", ""); user_name == "")
             {
                 SPDLOG_INFO("user_name is missing");
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name is missing"), req_content_type::json);
                 return;
             }
-            auto user_name = request["user_name"].get<std::string>();
 
             //Remove the user_name
             auto result = db::t_user_info::remove({{"user_name", user_name}});
@@ -111,7 +116,8 @@ namespace handler
         else if (op_type == "fetch")
         {
             //Get the parameter
-            if (!utils::all_string(request, {"user_name"}))
+            std::string user_name = "";
+            if (user_name = utils::get_string(request, "user_name", ""); user_name == "")
             {
                 SPDLOG_INFO("user_name is missing");
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name is missing"), req_content_type::json);
@@ -119,7 +125,6 @@ namespace handler
             }
 
             //Get the result
-            auto user_name = request["user_name"].get<std::string>();
             auto [user_info, exist] = db::t_user_info::fetch_first({{"user_name", user_name}});
             if (!exist)
             {
@@ -135,6 +140,108 @@ namespace handler
             result["profile"] = user_info.profile;
 
             res.set_status_and_content(status_type::ok, utils::resp(0, "", result), req_content_type::json);
+            return;
+        }
+        else if (op_type == "update")
+        {
+            //Get the user name
+            std::string user_name = "";
+            if (user_name = utils::get_string(request, "user_name", ""); user_name == "")
+            {
+                SPDLOG_INFO("user_name is missing");
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name is missing"), req_content_type::json);
+                return;
+            }
+
+            //Check exist
+            bool exist;
+            std::tie(std::ignore, exist) = db::t_user_info::fetch_first({{"user_name", user_name}});
+            if (!exist)
+            {
+                SPDLOG_INFO("user {} does not exist", user_name);
+                res.set_status_and_content(status_type::ok, utils::resp(10001, fmt::format("user {} does not exist", user_name)), req_content_type::json);
+                return;
+            }
+
+            //Update
+            std::unordered_map<std::string_view, std::any> new_values;
+            if (auto password = utils::get_string(request, "password", ""); password != "")
+            {
+                new_values.insert({"password", password});
+            }
+            if (auto email = utils::get_string(request, "email", ""); email != "")
+            {
+                new_values.insert({"email", email});
+            }
+            if (auto profile = utils::get_string(request, "profile", ""); profile != "")
+            {
+                new_values.insert({"profile", profile});
+            }
+
+            auto result = db::t_user_info::update({{"user_name", user_name}}, new_values);
+            if (result.affected_rows() == 0)
+            {
+                SPDLOG_INFO("failed to update");
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "failed to update"), req_content_type::json);
+                return;
+            }
+            res.set_status_and_content(status_type::ok, utils::resp(), req_content_type::json);
+            return;
+        }
+        else if (op_type == "insert_multi")
+        {
+            if (!request.is_array())
+            {
+                SPDLOG_INFO("please use array to upload data");
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "please use array to upload data"), req_content_type::json);
+                return;
+            }
+            std::map<std::string, std::string> result;
+            for (const auto &item : request)
+            {
+                //Get the parameter
+                if (!utils::all_string(item, {"user_name", "password"}))
+                {
+                    SPDLOG_INFO("user_name or password is not string");
+                    res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name or password is not string"), req_content_type::json);
+                    continue;
+                }
+
+                //Check if the name has been occupied
+                bool exist = false;
+                std::tie(std::ignore, exist) = db::t_user_info::fetch_first({{"user_name", item["user_name"].get<std::string>()}});
+                if (exist)
+                {
+                    SPDLOG_INFO("user name '{}' has been registered", item["user_name"].get<std::string>());
+                    res.set_status_and_content(status_type::ok, utils::resp(10001, "user name has been occupied"), req_content_type::json);
+                    return;
+                }
+            }
+
+            std::map<std::string,std::string> all_result;
+            for (const auto &item : request)
+            {
+                //Insert
+                std::map<std::string_view, std::any> data = {{"user_name", item["user_name"].get<std::string>()},
+                                                             {"password", item["password"].get<std::string>()},
+                                                             {"create_time", utils::now()}};
+                if (auto profile = utils::get_string(item, "profile", ""); profile != "")
+                {
+                    data.insert({"profile", profile});
+                }
+                if (auto email = utils::get_string(item, "email", ""); email != "")
+                {
+                    data.insert({"email", email});
+                }
+                auto result = db::t_user_info::insert(data);
+                if (result.affected_rows() == 0)
+                {
+                    SPDLOG_INFO("insert failed");
+                    auto user_name = item.get<std::string>();
+                    all_result[user_name] = "insert failed";
+                }
+            }
+            res.set_status_and_content(status_type::ok, utils::resp(0,"",all_result),req_content_type::json);
             return;
         }
         res.set_status_and_content(status_type::ok, utils::resp(10001, "op_type is not supported"), req_content_type::json);

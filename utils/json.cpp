@@ -46,4 +46,49 @@ namespace utils
         return all_type<nlohmann::json::value_t::boolean>(data, names);
     }
 
+    std::string get_string(const nlohmann::json &data, std::string name, std::string default_value)
+    {
+        if (data.contains(name) && data.is_string())
+        {
+            return data[name].get<std::string>();
+        }
+        return default_value;
+    }
+
+    long long get_number(const nlohmann::json &data, std::string name, long long default_value)
+    {
+        if (data.contains(name) && data.is_number())
+        {
+            return data[name].get<long long>();
+        }
+        return default_value;
+    }
+
+    int get_integer(const nlohmann::json &data, std::string name, int default_value)
+    {
+        if (data.contains(name) && data.is_number_integer())
+        {
+            return data[name].get<int>();
+        }
+        return default_value;
+    }
+
+    double get_float(const nlohmann::json &data, std::string name, double default_value)
+    {
+        if (data.contains(name) && data.is_number_float())
+        {
+            return data[name].get<double>();
+        }
+        return default_value;
+    }
+
+    bool all_boolean(const nlohmann::json &data, std::string name, bool default_value)
+    {
+        if (data.contains(name) && data.is_boolean())
+        {
+            return data[name].get<bool>();
+        }
+        return default_value;
+    }
+
 } // namespace utils
