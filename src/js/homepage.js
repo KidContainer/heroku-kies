@@ -1,6 +1,6 @@
-import Vue from "vue"
+// import Vue from "vue"
 
-export default function setup_homepage() {
+export function setup_homepage() {
     let data = {
         data() {
             return {
@@ -19,8 +19,8 @@ export default function setup_homepage() {
                 this.count++;
             }
         }
-    }
+    };
 
 
-    Vue.createApp(data).mount('div')
+    Vue.createApp(data).mount('div');
 }

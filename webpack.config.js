@@ -6,7 +6,10 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
     mode: 'production',
-    entry: './index.js',
+    entry: {
+        "main":'./index.js',
+        "404_not_found":"./404_not_found.js"
+    },
     output: {
         path: path.resolve(__dirname, 'www'),
         filename: 'js/[name].[contenthash].js',
@@ -18,11 +21,13 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             template: "./src/html/index.html",
-            filename: "html/index.html"
+            filename: "html/index.html",
+            chunks: ["main"]
         }),
         new HtmlWebpackPlugin({
             template: "./src/html/404_not_found.html",
-            filename: "html/404_not_found.html"
+            filename: "html/404_not_found.html",
+            chunks: ["404_not_found"]
         }),
         new CleanWebpackPlugin(),
     ],

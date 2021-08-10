@@ -1,0 +1,1 @@
+(()=>{"use strict";!function(){let t={data:()=>({name:"World",count:1,current_time:(new Date).toLocaleString(),true_name:"Yes"}),mounted(){let t=this;setInterval((function(){t.current_time=(new Date).toLocaleString()}),1e3)},methods:{increase(){this.count++}}};Vue.createApp(t).mount("div")}()})();

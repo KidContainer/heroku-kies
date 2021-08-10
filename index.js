@@ -1,4 +1,4 @@
+import {setup_homepage} from "./src/js/homepage"
 import "./src/css/style.css"
-import homepage from "./src/js/homepage"
 
-homepage();
+setup_homepage();
