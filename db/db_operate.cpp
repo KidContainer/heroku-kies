@@ -12,7 +12,7 @@ namespace db
         Database::print_result(result);
 
         //create t_blog
-        auto result = t_blog::create_table();
+        result = t_blog::create_table();
         Database::print_result(result);
         
     }
