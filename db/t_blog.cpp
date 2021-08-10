@@ -22,6 +22,7 @@ namespace db
             .title = res["title"].as<std::string>(),
             .sub_title = res["sub_title"].as<std::string>(),
         };
+        return result;
     }
 
     pqxx::result t_blog::create_table()
