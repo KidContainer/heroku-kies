@@ -17,11 +17,11 @@ module.exports = {
             filename: "css/[name].[contenthash].css"
         }),
         new HtmlWebpackPlugin({
-            template: "./template/html/index.html",
+            template: "./src/html/index.html",
             filename: "html/index.html"
         }),
         new HtmlWebpackPlugin({
-            template: "./template/html/404_not_found.html",
+            template: "./src/html/404_not_found.html",
             filename: "html/404_not_found.html"
         }),
         new CleanWebpackPlugin(),
