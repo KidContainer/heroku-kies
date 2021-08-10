@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Basic Web Page</title>
+    <script src="https://unpkg.com/vue@next"></script>
+</head>
+
+<body>
+    <div id="app">
+        Hello 
+        <span v-bind:title="true_name">{{name}}</span>, current time is {{current_time}}, current count is {{count}}!
+        <button v-on:click="increase">Click Me</button>
+    </div>
+    <script>
+        let data = {
+            data() {
+                return {
+                    name: "World",
+                    count: 1,
+                    current_time: new Date().toLocaleString(),
+                    true_name:"Yes"
+                }
+            },
+            mounted() {
+                let that = this;
+                setInterval(function(){that.current_time = new Date().toLocaleString()}, 1000);
+            },
+            methods:{
+                increase(){
+                    this.count++;
+                }
+            }
+        }
+
+
+        Vue.createApp(data).mount('div')
+    </script>
+</body>
+
+</html>
