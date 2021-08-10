@@ -1,8 +1,6 @@
 #include "json.hpp"
 #include <nlohmann/json.hpp>
 
-#include <iostream>
-
 namespace utils
 {
     std::string resp(int status_code, std::string_view status_message, nlohmann::json data)
@@ -89,6 +87,51 @@ namespace utils
             return data[name].get<bool>();
         }
         return default_value;
+    }
+
+    std::vector<std::string> to_string_vector(const std::string_view data)
+    {
+        if (!nlohmann::json::accept(data))
+        {
+            return {};
+        }
+        auto j = nlohmann::json::parse(data);
+        if (!j.is_array())
+        {
+            return {};
+        }
+
+        std::vector<std::string> content;
+        content.reserve(j.size());
+        for (const auto &item : j)
+        {
+            if (!item.is_string())
+            {
+                return {};
+            }
+            content.push_back(item.get<std::string>());
+        }
+        return content;
+    }
+
+    std::unordered_map<std::string, std::any> retreive_if_exist(const nlohmann::json &data, std::initializer_list<std::string> names)
+    {
+        std::unordered_map<std::string, std::any> result;
+        for(const auto& name : names){
+            if(!data.contains(name)){
+                continue;
+            }
+            if(data[name].is_string()){
+                result.insert({name,data[name].get<std::string>()});
+            }else if(data[name].is_number_float()){
+                result.insert({name,data[name].get<double>()});
+            }else if(data[name].is_number()){
+                result.insert({name,data[name].get<long long>()});
+            }else if(data[name].is_boolean()){
+                result.insert({name,data[name].get<bool>()});
+            }
+        }
+        return result;
     }
 
 } // namespace utils

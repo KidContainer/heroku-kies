@@ -7,9 +7,8 @@ namespace handler
 {
     void t_user_info_op(cinatra::request &req, cinatra::response &res);
 
+    void t_blog_op(cinatra::request &req, cinatra::response &res);
 
 } // namespace handler
-
-
 
 #endif

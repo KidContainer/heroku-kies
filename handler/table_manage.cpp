@@ -1,6 +1,8 @@
 #include "table_manage.hpp"
 #include <spdlog/spdlog.h>
 #include <string>
+#include <vector>
+#include <unordered_map>
 #include <nlohmann/json.hpp>
 
 #include "../db/db_operate.hpp"
@@ -9,6 +11,7 @@
 
 #include "../utils/json.hpp"
 #include "../utils/time.hpp"
+#include "../utils/container.hpp"
 
 using namespace cinatra;
 
@@ -41,7 +44,7 @@ namespace handler
         {
             SPDLOG_WARN("Request does not contains op_type");
             nlohmann::json data;
-            data["op_type_enum"] = {"insert", "remove", "fetch", "update", "insert_multi"};
+            data["op_type_enum"] = {"insert", "remove", "fetch", "update", "mulit_insert", "multi_fetch"};
             res.set_status_and_content(status_type::ok, utils::resp(10001, "op_type is needed", data), req_content_type::json);
             return;
         }
@@ -68,9 +71,9 @@ namespace handler
             }
 
             //Insert
-            std::map<std::string_view, std::any> data = {{"user_name", request["user_name"].get<std::string>()},
-                                                         {"password", request["password"].get<std::string>()},
-                                                         {"create_time", utils::now()}};
+            std::unordered_map<std::string_view, std::any> data = {{"user_name", request["user_name"].get<std::string>()},
+                                                                   {"password", request["password"].get<std::string>()},
+                                                                   {"create_time", utils::now()}};
             if (auto profile = utils::get_string(request, "profile", ""); profile != "")
             {
                 data.insert({"profile", profile});
@@ -79,6 +82,7 @@ namespace handler
             {
                 data.insert({"email", email});
             }
+
             auto result = db::t_user_info::insert(data);
             if (result.affected_rows() == 0)
             {
@@ -116,20 +120,14 @@ namespace handler
         else if (op_type == "fetch")
         {
             //Get the parameter
-            std::string user_name = "";
-            if (user_name = utils::get_string(request, "user_name", ""); user_name == "")
-            {
-                SPDLOG_INFO("user_name is missing");
-                res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name is missing"), req_content_type::json);
-                return;
-            }
+            auto condition = utils::retreive_if_exist(request, {"user_name", "create_time", "last_login", "email", "profile"});
 
             //Get the result
-            auto [user_info, exist] = db::t_user_info::fetch_first({{"user_name", user_name}});
+            auto [user_info, exist] = db::t_user_info::fetch_first(utils::s_map_to_sv_map(condition));
             if (!exist)
             {
-                SPDLOG_INFO("user {} does not exist", user_name);
-                res.set_status_and_content(status_type::ok, utils::resp(10001, fmt::format("user {} does not exist", user_name)), req_content_type::json);
+                SPDLOG_INFO("data does not exist, condition={}", request.dump());
+                res.set_status_and_content(status_type::ok, utils::resp(10001, fmt::format("data does not exist, condition={}", request.dump())), req_content_type::json);
                 return;
             }
             nlohmann::json result;
@@ -188,7 +186,7 @@ namespace handler
             res.set_status_and_content(status_type::ok, utils::resp(), req_content_type::json);
             return;
         }
-        else if (op_type == "insert_multi")
+        else if (op_type == "mulit_insert")
         {
             if (!request.is_array())
             {
@@ -196,7 +194,7 @@ namespace handler
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "please use array to upload data"), req_content_type::json);
                 return;
             }
-            std::map<std::string, std::string> result;
+
             for (const auto &item : request)
             {
                 //Get the parameter
@@ -218,13 +216,13 @@ namespace handler
                 }
             }
 
-            std::map<std::string,std::string> all_result;
+            std::vector<std::unordered_map<std::string_view, std::any>> all_data;
             for (const auto &item : request)
             {
                 //Insert
-                std::map<std::string_view, std::any> data = {{"user_name", item["user_name"].get<std::string>()},
-                                                             {"password", item["password"].get<std::string>()},
-                                                             {"create_time", utils::now()}};
+                std::unordered_map<std::string_view, std::any> data = {{"user_name", item["user_name"].get<std::string>()},
+                                                                       {"password", item["password"].get<std::string>()},
+                                                                       {"create_time", utils::now()}};
                 if (auto profile = utils::get_string(item, "profile", ""); profile != "")
                 {
                     data.insert({"profile", profile});
@@ -233,18 +231,54 @@ namespace handler
                 {
                     data.insert({"email", email});
                 }
-                auto result = db::t_user_info::insert(data);
-                if (result.affected_rows() == 0)
-                {
-                    SPDLOG_INFO("insert failed");
-                    auto user_name = item.get<std::string>();
-                    all_result[user_name] = "insert failed";
-                }
+
+                all_data.push_back(data);
             }
-            res.set_status_and_content(status_type::ok, utils::resp(0,"",all_result),req_content_type::json);
+            auto result = db::t_user_info::insert(all_data);
+            if (result.affected_rows() == 0)
+            {
+                SPDLOG_INFO("insert failed");
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "insert failed"), req_content_type::json);
+                return;
+            }
+            res.set_status_and_content(status_type::ok, utils::resp(0, ""), req_content_type::json);
+            return;
+        }
+        else if (op_type == "mulit_fetch")
+        {
+            if (!utils::all_ingeter(request, {"limit"}))
+            {
+                SPDLOG_INFO("limit is missing");
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "limit is missing"), req_content_type::json);
+                return;
+            }
+            auto limit = utils::get_integer(request, "limit", 0);
+
+            auto condition = utils::retreive_if_exist(request, {"user_name", "create_time", "last_login", "email", "profile"});
+
+            //Get the result
+            auto users_info = db::t_user_info::fetch(utils::s_map_to_sv_map(condition));
+            std::vector<nlohmann::json> results;
+            results.reserve(users_info.size());
+            for (auto &&item : users_info)
+            {
+                nlohmann::json result;
+                result["user_name"] = item.user_name;
+                result["create_time"] = item.create_time;
+                result["last_login"] = item.last_login;
+                result["email"] = item.email;
+                result["profile"] = item.profile;
+
+                results.push_back(result);
+            }
+            res.set_status_and_content(status_type::ok,utils::resp(0,"", results), req_content_type::json);
             return;
         }
         res.set_status_and_content(status_type::ok, utils::resp(10001, "op_type is not supported"), req_content_type::json);
+    }
+
+    void t_blog_op(cinatra::request &req, cinatra::response &res)
+    {
     }
 
 } // namespace handler

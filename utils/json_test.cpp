@@ -63,6 +63,7 @@ TEST(JSON_TEST, JSON_TEST_1)
     
     EXPECT_FALSE(all_string(data, {"string_a", "string_b", "float_a", "float_b","boolean_a"}));
 
+
 }
 
 int main(int argc, char **argv)

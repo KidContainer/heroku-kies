@@ -3,6 +3,9 @@
 
 #include <string>
 #include <string_view>
+#include <vector>
+#include <unordered_map>
+#include <any>
 #include <nlohmann/json.hpp>
 namespace utils
 {
@@ -28,6 +31,9 @@ namespace utils
 
     bool all_boolean(const nlohmann::json &data, std::string name, bool default_value);
 
+    std::vector<std::string> to_string_vector(const std::string_view data);
+
+    std::unordered_map<std::string, std::any> retreive_if_exist(const nlohmann::json& data, std::initializer_list<std::string> names);
 } // namespace utils
 
 #endif

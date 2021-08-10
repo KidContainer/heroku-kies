@@ -4,7 +4,6 @@
 #include <string>
 #include <pqxx/pqxx>
 #include <unordered_map>
-#include <map>
 #include <any>
 
 namespace db
@@ -39,9 +38,9 @@ namespace db
 
         static pqxx::result update(std::unordered_map<std::string_view, std::any> condition, std::unordered_map<std::string_view, std::any> value, int limit=0);
 
-        static pqxx::result insert(std::map<std::string_view, std::any> value);
+        static pqxx::result insert(std::unordered_map<std::string_view, std::any> value);
 
-        static pqxx::result insert(std::vector<std::map<std::string_view, std::any>> value);
+        static pqxx::result insert(std::vector<std::unordered_map<std::string_view, std::any>> value);
         
     };
     

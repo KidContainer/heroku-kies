@@ -7,7 +7,7 @@ include(CTest)
 
 if(LIMIT_MEM)
     message("Limit Compiler Memory Usage")
-    add_compile_options("SHELL:--param ggc-min-expand=1" "SHELL:--param ggc-min-heapsize=131072")
+    add_compile_options("SHELL:--param ggc-min-expand=1" "SHELL:--param ggc-min-heapsize=101072")
 endif()
 
 add_compile_options(-fsanitize=address -g)

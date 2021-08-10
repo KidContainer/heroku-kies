@@ -2,6 +2,7 @@
 #include "db_manager.hpp"
 #include <spdlog/spdlog.h>
 #include "../utils/any.hpp"
+#include "../utils/json.hpp"
 
 namespace db
 {
@@ -12,7 +13,7 @@ namespace db
 
     t_blog t_blog::row_to_blog(pqxx::row res)
     {
-        auto result = t_blog{
+        return t_blog{
             .id = res["id"].as<std::int64_t>(),
             .user_id = res["user_id"].as<std::int64_t>(),
             .content = res["content"].as<std::string>(),
@@ -21,8 +22,9 @@ namespace db
             .modified_count = res["modified_count"].as<std::int64_t>(),
             .title = res["title"].as<std::string>(),
             .sub_title = res["sub_title"].as<std::string>(),
+            .tags = utils::to_string_vector(res["tags"].as<std::string>()),
+            .images = utils::to_string_vector(res["images"].as<std::string>()),
         };
-        return result;
     }
 
     pqxx::result t_blog::create_table()
@@ -30,12 +32,15 @@ namespace db
         pqxx::work t(Database::get_conn());
         auto sql = fmt::format(R"sql(CREATE TABLE IF NOT EXISTS {} (
                         id              SERIAL PRIMARY KEY,
-                        user_name       VARCHAR(200) NOT NULL UNIQUE,
-                        password        VARCHAR(200) NOT NULL,
+                        user_id         INTEGER NOT NULL,
+                        content         TEXT NOT NULL,
                         create_time     INTEGER NOT NULL,
-                        last_login      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        email           VARCHAR(100) DEFAULT '[no email]',
-                        profile         VARCHAR(300) DEFAULT '/img/profile/default_profile.jpeg'
+                        update_time     INTEGER NOT NULL,
+                        modified_count  INTEGER DEFAULT 0,
+                        title           VARCHAR(150) DEFAULT '',
+                        sub_title       VARCHAR(300) DEFAULT '',
+                        tags            VARCHAR(300) DEFAULT '',
+                        images          TEXT DEFAULT ''
                 ))sql",
                                table_name());
 

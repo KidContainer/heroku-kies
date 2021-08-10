@@ -15,13 +15,13 @@ namespace db
         t_user_info t_user_info::row_to_user_info(pqxx::row res)
         {
                 return t_user_info{
-                    .id = res[0].as<std::int64_t>(),
-                    .user_name = res[1].as<std::string>(),
-                    .password = res[2].as<std::string>(),
-                    .create_time = res[3].as<std::int64_t>(),
-                    .last_login = res[4].as<std::string>(),
-                    .email = res[5].as<std::string>(),
-                    .profile = res[6].as<std::string>(),
+                    .id = res["id"].as<std::int64_t>(),
+                    .user_name = res["user_name"].as<std::string>(),
+                    .password = res["password"].as<std::string>(),
+                    .create_time = res["create_time"].as<std::int64_t>(),
+                    .last_login = res["last_login"].as<std::string>(),
+                    .email = res["email"].as<std::string>(),
+                    .profile = res["profile"].as<std::string>(),
                 };
         }
 
@@ -159,7 +159,7 @@ namespace db
                 return result;
         }
 
-        pqxx::result t_user_info::insert(std::map<std::string_view, std::any> value)
+        pqxx::result t_user_info::insert(std::unordered_map<std::string_view, std::any> value)
         {
                 if (value.empty())
                 {
@@ -188,7 +188,7 @@ namespace db
                 return result;
         }
 
-        pqxx::result t_user_info::insert(std::vector<std::map<std::string_view, std::any>> value)
+        pqxx::result t_user_info::insert(std::vector<std::unordered_map<std::string_view, std::any>> value)
         {
                 if (value.empty())
                 {
