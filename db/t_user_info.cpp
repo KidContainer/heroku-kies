@@ -14,6 +14,11 @@ namespace db
 
         t_user_info t_user_info::row_to_user_info(pqxx::row res)
         {
+
+                if (res["hello"].is_null())
+                {
+                        SPDLOG_INFO("hello is null");
+                }
                 return t_user_info{
                     .id = res["id"].as<std::int64_t>(),
                     .user_name = res["user_name"].as<std::string>(),
@@ -132,25 +137,28 @@ namespace db
 
         pqxx::result t_user_info::update(std::unordered_map<std::string_view, std::any> condition, std::unordered_map<std::string_view, std::any> value, int limit)
         {
-                if(condition.empty() || value.empty()){
+                if (condition.empty() || value.empty())
+                {
                         return pqxx::result();
                 }
                 pqxx::work t(Database::get_conn());
                 std::stringstream ss;
-                ss<<fmt::format("UPDATE {} SET",table_name());
+                ss << fmt::format("UPDATE {} SET", table_name());
                 std::string sep = " ";
-                for(auto&& item : value){
-                        ss<<sep<<item.first<<"="<<t.quote(utils::any_to_string(item.second));
+                for (auto &&item : value)
+                {
+                        ss << sep << item.first << "=" << t.quote(utils::any_to_string(item.second));
                         sep = ", ";
                 }
 
-                ss<<" WHERE";
+                ss << " WHERE";
                 sep = " ";
-                for(auto&& item : condition){
-                        ss<<sep<<item.first<<"="<<t.quote(utils::any_to_string(item.second));
+                for (auto &&item : condition)
+                {
+                        ss << sep << item.first << "=" << t.quote(utils::any_to_string(item.second));
                         sep = " AND ";
                 }
-                SPDLOG_INFO("sql={}",ss.str());
+                SPDLOG_INFO("sql={}", ss.str());
                 auto result = t.exec(ss.str(), "[UPDATE]");
                 t.commit();
                 return result;
@@ -158,57 +166,64 @@ namespace db
 
         pqxx::result t_user_info::insert(std::map<std::string_view, std::any> value)
         {
-                if(value.empty()){
+                if (value.empty())
+                {
                         return pqxx::result{};
                 }
                 pqxx::work t(Database::get_conn());
                 std::stringstream ss;
-                ss << fmt::format("INSERT INTO {}(",table_name());
+                ss << fmt::format("INSERT INTO {}(", table_name());
                 std::string sep = "";
-                for(auto&& item : value){
-                        ss<<sep<<item.first;
-                        sep=", ";
+                for (auto &&item : value)
+                {
+                        ss << sep << item.first;
+                        sep = ", ";
                 }
-                ss<<") VALUES(";
-                sep="";
-                for(auto&& item : value){
-                        ss<<sep<<t.quote(utils::any_to_string(item.second));
-                        sep=", ";
+                ss << ") VALUES(";
+                sep = "";
+                for (auto &&item : value)
+                {
+                        ss << sep << t.quote(utils::any_to_string(item.second));
+                        sep = ", ";
                 }
-                ss<<")";
-                SPDLOG_INFO("sql={}",ss.str());
-                auto result = t.exec(ss.str(),"[INSERT]");
+                ss << ")";
+                SPDLOG_INFO("sql={}", ss.str());
+                auto result = t.exec(ss.str(), "[INSERT]");
                 t.commit();
                 return result;
         }
 
         pqxx::result t_user_info::insert(std::vector<std::map<std::string_view, std::any>> value)
         {
-                if(value.empty()){
+                if (value.empty())
+                {
                         return pqxx::result{};
                 }
                 pqxx::work t(Database::get_conn());
                 std::stringstream ss;
-                ss << fmt::format("INSERT INTO {}(",table_name());
+                ss << fmt::format("INSERT INTO {}(", table_name());
                 std::string sep = "";
-                for(auto&& item : value[0]){
-                        ss<<sep<<item.first;
+                for (auto &&item : value[0])
+                {
+                        ss << sep << item.first;
                         sep = ", ";
                 }
-                ss<<") VALUES";
+                ss << ") VALUES";
                 sep = "";
-                for(auto&& item : value){
-                        ss<<sep<<"(";
+                for (auto &&item : value)
+                {
+                        ss << sep << "(";
                         std::string sep_ = "";
-                        for(auto&& v : item){
-                                ss<<sep_<<t.quote(utils::any_to_string(v.second));
+                        for (auto &&v : item)
+                        {
+                                ss << sep_ << t.quote(utils::any_to_string(v.second));
                                 sep_ = ", ";
                         }
-                        ss<<")";
-                        sep=", ";
+                        ss << ")";
+                        sep = ", ";
                 }
                 SPDLOG_INFO("sql={}", ss.str());
-                auto result = t.exec(ss.str(),"[BATCH INSERT]");
+                auto result = t.exec(ss.str(), "[BATCH INSERT]");
                 t.commit();
                 return result;
         }
