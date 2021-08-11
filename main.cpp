@@ -21,7 +21,7 @@ void bind_api(http_server &server)
 {
     server.set_http_handler<POST>("/api/upload_file", handler::upload_file); //Update file handler
     server.set_http_handler<POST>("/api/db/t_user_info_op", handler::t_user_info_op);
-
+    server.set_http_handler<POST>("api/db/t_blog", handler::t_blog_op);
 }
 
 int main()
