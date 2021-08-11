@@ -188,14 +188,15 @@ namespace handler
         }
         else if (op_type == "multi_insert")
         {
-            if (!request.is_array())
+            if (!request.contains("users") || !request["users"].is_array())
             {
-                SPDLOG_INFO("please use array to upload data");
-                res.set_status_and_content(status_type::ok, utils::resp(10001, "please use array to upload data"), req_content_type::json);
+                SPDLOG_INFO("please use array named users to upload data");
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "please use array named users to upload data"), req_content_type::json);
                 return;
             }
+            auto users = request["users"];
 
-            for (const auto &item : request)
+            for (const auto &item : users)
             {
                 //Get the parameter
                 if (!utils::all_string(item, {"user_name", "password"}))
@@ -217,7 +218,7 @@ namespace handler
             }
 
             std::vector<std::unordered_map<std::string_view, std::any>> all_data;
-            for (const auto &item : request)
+            for (const auto &item : users)
             {
                 //Insert
                 std::unordered_map<std::string_view, std::any> data = {{"user_name", item["user_name"].get<std::string>()},
@@ -414,17 +415,18 @@ namespace handler
         }
         else if (op_type == "multi_insert")
         {
-            if (!request.is_array())
+            if (!request.contains("blogs") || !request["blogs"].is_array())
             {
-                SPDLOG_INFO("please use array to upload data");
-                res.set_status_and_content(status_type::ok, utils::resp(10001, "please use array to upload data"), req_content_type::json);
+                SPDLOG_INFO("please use array named blogs to upload data");
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "please use array named blogs to upload data"), req_content_type::json);
                 return;
             }
+            auto blogs = request["blogs"];
 
-            for (const auto &item : request)
+            for (const auto &item : blogs)
             {
                 //Get the parameter
-                if (!utils::all_string(request, {"user_id", "content", "title", "sub_title", "tags", "images"}))
+                if (!utils::all_string(item, {"user_id", "content", "title", "sub_title", "tags", "images"}))
                 {
                     SPDLOG_INFO("parameter is wrong");
                     res.set_status_and_content(status_type::ok, utils::resp(10001, "parameter is wrong"), req_content_type::json);
@@ -433,10 +435,10 @@ namespace handler
             }
 
             std::vector<std::unordered_map<std::string_view, std::any>> all_data;
-            for (const auto &item : request)
+            for (const auto &item : blogs)
             {
                 //Insert
-                auto data = utils::retrieve_if_exist(request, {"user_id", "content", "title", "sub_title", "tags", "images"});
+                auto data = utils::retrieve_if_exist(item, {"user_id", "content", "title", "sub_title", "tags", "images"});
 
                 all_data.push_back(data);
             }
