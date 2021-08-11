@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include <algorithm>
+#include <unordered_set>
 #include <nlohmann/json.hpp>
 
 #include "../db/db_operate.hpp"
@@ -209,14 +209,15 @@ namespace handler
             }
 
             // Check if contains the same data
-            auto length = users.size();
-            std::unique(users.begin(), users.end(), [](const auto& a, const auto& b)
-                        { return a["user_name"] == b["user_name"]; });
-            if (users.size() != length)
-            {
-                SPDLOG_INFO("could not insert duplicated data");
-                res.set_status_and_content(status_type::ok, utils::resp(10001, "could not insert duplicated data"), req_content_type::json);
-                return;
+            std::unordered_set<std::string> s;
+            s.reserve(users.size());
+            for(auto&& item: users){
+                if(s.find(std::string(item["user_name"])) != s.end()){
+                    SPDLOG_INFO("there are duplicated data");
+                    res.set_status_and_content(status_type::ok, utils::resp(10001, "there are duplicated data"), req_content_type::json);
+                    return;
+                }
+                s.insert(std::string(item["user_name"]));
             }
 
             //Check if database has the key
