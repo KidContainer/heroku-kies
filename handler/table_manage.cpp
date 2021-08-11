@@ -203,7 +203,7 @@ namespace handler
                     return;
                 }
 
-                if (!utils::all_ingeter(request, {"gender"}))
+                if (!utils::all_ingeter(item, {"gender"}))
                 {
                     SPDLOG_INFO("gender is not integer");
                     res.set_status_and_content(status_type::ok, utils::resp(10001, "gender is not integer"), req_content_type::json);
