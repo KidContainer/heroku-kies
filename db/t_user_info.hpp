@@ -8,23 +8,23 @@
 
 namespace db
 {
-    class t_user_info{
+    class t_user_info
+    {
         //Data
-        public:
+    public:
         std::int64_t id;
         std::string user_name;
-        std::int8_t gender;
+        std::int16_t gender;
         std::string password;
         std::int64_t create_time;
         std::string last_login;
         std::string email;
         std::string profile;
 
-        private:
+    private:
         static t_user_info row_to_user_info(pqxx::row res);
 
-
-        public:
+    public:
         static inline std::string table_name();
 
         static pqxx::result create_table();
@@ -33,20 +33,17 @@ namespace db
 
         static std::vector<t_user_info> fetch(std::unordered_map<std::string_view, std::any> condition);
 
-        static std::tuple<t_user_info,bool> fetch_first(std::unordered_map<std::string_view, std::any> condition);
+        static std::tuple<t_user_info, bool> fetch_first(std::unordered_map<std::string_view, std::any> condition);
 
         static pqxx::result remove(std::unordered_map<std::string_view, std::any> condition);
 
-        static pqxx::result update(std::unordered_map<std::string_view, std::any> condition, std::unordered_map<std::string_view, std::any> value, int limit=0);
+        static pqxx::result update(std::unordered_map<std::string_view, std::any> condition, std::unordered_map<std::string_view, std::any> value, int limit = 0);
 
         static pqxx::result insert(std::unordered_map<std::string_view, std::any> value);
 
         static pqxx::result insert(std::vector<std::unordered_map<std::string_view, std::any>> value);
-        
     };
-    
+
 } // namespace db
-
-
 
 #endif
