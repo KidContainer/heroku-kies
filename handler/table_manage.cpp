@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <algorithm>
 #include <nlohmann/json.hpp>
 
 #include "../db/db_operate.hpp"
@@ -203,9 +204,24 @@ namespace handler
                 {
                     SPDLOG_INFO("user_name or password is not string");
                     res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name or password is not string"), req_content_type::json);
-                    continue;
+                    return;
                 }
+            }
 
+            // Check if contains the same data
+            auto length = users.size();
+            std::unique(users.begin(), users.end(), [](const auto& a, const auto& b)
+                        { return a["user_name"] == b["user_name"]; });
+            if (users.size() != length)
+            {
+                SPDLOG_INFO("could not insert duplicated data");
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "could not insert duplicated data"), req_content_type::json);
+                return;
+            }
+
+            //Check if database has the key
+            for (const auto &item : users)
+            {
                 //Check if the name has been occupied
                 bool exist = false;
                 std::tie(std::ignore, exist) = db::t_user_info::fetch_first({{"user_name", item["user_name"].get<std::string>()}});
@@ -430,7 +446,7 @@ namespace handler
                 {
                     SPDLOG_INFO("parameter is wrong");
                     res.set_status_and_content(status_type::ok, utils::resp(10001, "parameter is wrong"), req_content_type::json);
-                    continue;
+                    return;
                 }
             }
 
