@@ -33,7 +33,7 @@ namespace utils
 
     std::vector<std::string> to_string_vector(const std::string_view data);
 
-    std::unordered_map<std::string, std::any> retreive_if_exist(const nlohmann::json& data, std::initializer_list<std::string> names);
+    std::unordered_map<std::string_view, std::any> retrieve_if_exist(const nlohmann::json& data, std::initializer_list<std::string_view> names);
 } // namespace utils
 
 #endif

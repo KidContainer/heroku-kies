@@ -164,7 +164,7 @@ namespace db
         return result;
     }
 
-    pqxx::result t_blog::insert(std::map<std::string_view, std::any> value)
+    pqxx::result t_blog::insert(std::unordered_map<std::string_view, std::any> value)
     {
         if (value.empty())
         {
@@ -193,7 +193,7 @@ namespace db
         return result;
     }
 
-    pqxx::result t_blog::insert(std::vector<std::map<std::string_view, std::any>> value)
+    pqxx::result t_blog::insert(std::vector<std::unordered_map<std::string_view, std::any>> value)
     {
         if (value.empty())
         {

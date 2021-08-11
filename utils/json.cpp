@@ -114,21 +114,22 @@ namespace utils
         return content;
     }
 
-    std::unordered_map<std::string, std::any> retreive_if_exist(const nlohmann::json &data, std::initializer_list<std::string> names)
+    std::unordered_map<std::string_view, std::any> retrieve_if_exist(const nlohmann::json &data, std::initializer_list<std::string_view> names)
     {
-        std::unordered_map<std::string, std::any> result;
-        for(const auto& name : names){
-            if(!data.contains(name)){
+        std::unordered_map<std::string_view, std::any> result;
+        for(auto name_view : names){
+            if(!data.contains(name_view)){
                 continue;
             }
+            std::string name = std::string(name_view);
             if(data[name].is_string()){
-                result.insert({name,data[name].get<std::string>()});
+                result.insert({name_view,data[name].get<std::string>()});
             }else if(data[name].is_number_float()){
-                result.insert({name,data[name].get<double>()});
+                result.insert({name_view,data[name].get<double>()});
             }else if(data[name].is_number()){
-                result.insert({name,data[name].get<long long>()});
+                result.insert({name_view,data[name].get<long long>()});
             }else if(data[name].is_boolean()){
-                result.insert({name,data[name].get<bool>()});
+                result.insert({name_view,data[name].get<bool>()});
             }
         }
         return result;

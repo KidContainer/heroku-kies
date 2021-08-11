@@ -8,10 +8,10 @@
 #include "../db/db_operate.hpp"
 #include "../db/t_user_info.hpp"
 #include "../db/db_manager.hpp"
+#include "../db/t_blog.hpp"
 
 #include "../utils/json.hpp"
 #include "../utils/time.hpp"
-#include "../utils/container.hpp"
 
 using namespace cinatra;
 
@@ -44,7 +44,7 @@ namespace handler
         {
             SPDLOG_WARN("Request does not contains op_type");
             nlohmann::json data;
-            data["op_type_enum"] = {"insert", "remove", "fetch", "update", "mulit_insert", "multi_fetch"};
+            data["op_type_enum"] = {"insert", "remove", "fetch", "update", "multi_insert", "multi_fetch"};
             res.set_status_and_content(status_type::ok, utils::resp(10001, "op_type is needed", data), req_content_type::json);
             return;
         }
@@ -120,10 +120,10 @@ namespace handler
         else if (op_type == "fetch")
         {
             //Get the parameter
-            auto condition = utils::retreive_if_exist(request, {"user_name", "create_time", "last_login", "email", "profile"});
+            auto condition = utils::retrieve_if_exist(request, {"user_name", "create_time", "last_login", "email", "profile"});
 
             //Get the result
-            auto [user_info, exist] = db::t_user_info::fetch_first(utils::s_map_to_sv_map(condition));
+            auto [user_info, exist] = db::t_user_info::fetch_first(condition);
             if (!exist)
             {
                 SPDLOG_INFO("data does not exist, condition={}", request.dump());
@@ -186,7 +186,7 @@ namespace handler
             res.set_status_and_content(status_type::ok, utils::resp(), req_content_type::json);
             return;
         }
-        else if (op_type == "mulit_insert")
+        else if (op_type == "multi_insert")
         {
             if (!request.is_array())
             {
@@ -244,20 +244,12 @@ namespace handler
             res.set_status_and_content(status_type::ok, utils::resp(0, ""), req_content_type::json);
             return;
         }
-        else if (op_type == "mulit_fetch")
+        else if (op_type == "multi_fetch")
         {
-            if (!utils::all_ingeter(request, {"limit"}))
-            {
-                SPDLOG_INFO("limit is missing");
-                res.set_status_and_content(status_type::ok, utils::resp(10001, "limit is missing"), req_content_type::json);
-                return;
-            }
-            auto limit = utils::get_integer(request, "limit", 0);
-
-            auto condition = utils::retreive_if_exist(request, {"user_name", "create_time", "last_login", "email", "profile"});
+            auto condition = utils::retrieve_if_exist(request, {"user_name", "create_time", "last_login", "email", "profile"});
 
             //Get the result
-            auto users_info = db::t_user_info::fetch(utils::s_map_to_sv_map(condition));
+            auto users_info = db::t_user_info::fetch(condition);
             std::vector<nlohmann::json> results;
             results.reserve(users_info.size());
             for (auto &&item : users_info)
@@ -271,7 +263,7 @@ namespace handler
 
                 results.push_back(result);
             }
-            res.set_status_and_content(status_type::ok,utils::resp(0,"", results), req_content_type::json);
+            res.set_status_and_content(status_type::ok, utils::resp(0, "", results), req_content_type::json);
             return;
         }
         res.set_status_and_content(status_type::ok, utils::resp(10001, "op_type is not supported"), req_content_type::json);
@@ -279,6 +271,214 @@ namespace handler
 
     void t_blog_op(cinatra::request &req, cinatra::response &res)
     {
+        SPDLOG_INFO("operation for t_blog_op, ip={}", req.get_header_value("X-Forwarded-For"));
+
+        //content type check
+        if (req.get_content_type() != content_type::string)
+        {
+            SPDLOG_WARN("Unsupported ContentType, which is {}", req.get_content_type());
+            res.set_status_and_content(status_type::ok, utils::resp(10001, "unsupported Content-Type"), req_content_type::json);
+            return;
+        }
+
+        //json valid check
+        if (!nlohmann::json::accept(req.body()))
+        {
+            SPDLOG_WARN("Request body is not a valid json, it's {}", req.body());
+            res.set_status_and_content(status_type::ok, utils::resp(10001, "it's not a valid json"), req_content_type::json);
+            return;
+        }
+
+        nlohmann::json request = nlohmann::json::parse(req.body());
+
+        // get op type
+        if (!utils::all_string(request, {"op_type"}))
+        {
+            SPDLOG_WARN("Request does not contains op_type");
+            nlohmann::json data;
+            data["op_type_enum"] = {"insert", "remove", "fetch", "update", "multi_insert", "multi_fetch"};
+            res.set_status_and_content(status_type::ok, utils::resp(10001, "op_type is needed", data), req_content_type::json);
+            return;
+        }
+
+        const auto op_type = request["op_type"].get<std::string>();
+        if (op_type == "insert")
+        {
+            //Get the parameter
+            if (!utils::all_string(request, {"user_id", "content", "title", "sub_title", "tags", "images"}))
+            {
+                SPDLOG_INFO("parameter is not missing");
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "parameter is missing"), req_content_type::json);
+                return;
+            }
+
+            auto data = utils::retrieve_if_exist(request, {"user_id", "content", "title", "sub_title", "tags", "images"});
+
+            //Insert
+
+            auto result = db::t_blog::insert(data);
+            if (result.affected_rows() == 0)
+            {
+                SPDLOG_INFO("insert failed");
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "insert failed"), req_content_type::json);
+                return;
+            }
+
+            res.set_status_and_content(status_type::ok, utils::resp(), req_content_type::json);
+            return;
+        }
+        else if (op_type == "remove")
+        {
+            //Get the parameter
+            std::int64_t id;
+            if (id = utils::get_number(request, "id", -1); id == -1)
+            {
+                SPDLOG_INFO("id is missing");
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "id is missing"), req_content_type::json);
+                return;
+            }
+
+            //Remove the user_name
+            auto result = db::t_blog::remove({{"id", id}});
+            if (result.affected_rows() == 0)
+            {
+                SPDLOG_INFO("failed to remove");
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "failed to remove"), req_content_type::json);
+                return;
+            }
+
+            res.set_status_and_content(status_type::ok, utils::resp(), req_content_type::json);
+            return;
+        }
+        else if (op_type == "fetch")
+        {
+            //Get the parameter
+            auto condition = utils::retrieve_if_exist(request, {"id", "user_id", "title"});
+
+            //Get the result
+            auto [blog, exist] = db::t_blog::fetch_first(condition);
+            if (!exist)
+            {
+                SPDLOG_INFO("data does not exist, condition={}", request.dump());
+                res.set_status_and_content(status_type::ok, utils::resp(10001, fmt::format("data does not exist, condition={}", request.dump())), req_content_type::json);
+                return;
+            }
+            nlohmann::json result;
+            result["id"] = blog.id;
+            result["user_id"] = blog.user_id;
+            result["content"] = blog.content;
+            result["modified_count"] = blog.modified_count;
+            result["create_time"] = blog.create_time;
+            result["update_time"] = blog.update_time;
+            result["title"] = blog.title;
+            result["sub_title"] = blog.sub_title;
+            result["tags"] = blog.tags;
+            result["images"] = blog.images;
+
+            res.set_status_and_content(status_type::ok, utils::resp(0, "", result), req_content_type::json);
+            return;
+        }
+        else if (op_type == "update")
+        {
+            //Get the user name
+            std::int64_t id;
+            if (id = utils::get_number(request, "id", -1); id == -1)
+            {
+                SPDLOG_INFO("id is missing");
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "id is missing"), req_content_type::json);
+                return;
+            }
+
+            //Check exist
+            bool exist;
+            std::tie(std::ignore, exist) = db::t_blog::fetch_first({{"id", id}});
+            if (!exist)
+            {
+                SPDLOG_INFO("id {} does not exist", id);
+                res.set_status_and_content(status_type::ok, utils::resp(10001, fmt::format("id {} does not exist", id)), req_content_type::json);
+                return;
+            }
+
+            //Update
+            auto data = utils::retrieve_if_exist(request, {"content", "create_time", "update_time", "modified_count", "title", "sub_title", "tags", "images"});
+
+            auto result = db::t_user_info::update({{"id", id}}, data);
+            if (result.affected_rows() == 0)
+            {
+                SPDLOG_INFO("failed to update");
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "failed to update"), req_content_type::json);
+                return;
+            }
+            res.set_status_and_content(status_type::ok, utils::resp(), req_content_type::json);
+            return;
+        }
+        else if (op_type == "multi_insert")
+        {
+            if (!request.is_array())
+            {
+                SPDLOG_INFO("please use array to upload data");
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "please use array to upload data"), req_content_type::json);
+                return;
+            }
+
+            for (const auto &item : request)
+            {
+                //Get the parameter
+                if (!utils::all_string(request, {"user_id", "content", "title", "sub_title", "tags", "images"}))
+                {
+                    SPDLOG_INFO("parameter is wrong");
+                    res.set_status_and_content(status_type::ok, utils::resp(10001, "parameter is wrong"), req_content_type::json);
+                    continue;
+                }
+            }
+
+            std::vector<std::unordered_map<std::string_view, std::any>> all_data;
+            for (const auto &item : request)
+            {
+                //Insert
+                auto data = utils::retrieve_if_exist(request, {"user_id", "content", "title", "sub_title", "tags", "images"});
+
+                all_data.push_back(data);
+            }
+            auto result = db::t_user_info::insert(all_data);
+            if (result.affected_rows() == 0)
+            {
+                SPDLOG_INFO("insert failed");
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "insert failed"), req_content_type::json);
+                return;
+            }
+            res.set_status_and_content(status_type::ok, utils::resp(0, ""), req_content_type::json);
+            return;
+        }
+        else if (op_type == "multi_fetch")
+        {
+            auto condition = utils::retrieve_if_exist(request, {"id", "user_id", "title"});
+
+            //Get the result
+            auto blogs = db::t_blog::fetch(condition);
+            std::vector<nlohmann::json> results;
+            results.reserve(blogs.size());
+            for (auto &&blog : blogs)
+            {
+                nlohmann::json result;
+                result["id"] = blog.id;
+                result["user_id"] = blog.user_id;
+                result["content"] = blog.content;
+                result["modified_count"] = blog.modified_count;
+                result["create_time"] = blog.create_time;
+                result["update_time"] = blog.update_time;
+                result["title"] = blog.title;
+                result["sub_title"] = blog.sub_title;
+                result["tags"] = blog.tags;
+                result["images"] = blog.images;
+                
+
+                results.push_back(result);
+            }
+            res.set_status_and_content(status_type::ok, utils::resp(0, "", results), req_content_type::json);
+            return;
+        }
+        res.set_status_and_content(status_type::ok, utils::resp(10001, "op_type is not supported"), req_content_type::json);
     }
 
 } // namespace handler
