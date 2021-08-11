@@ -163,21 +163,9 @@ namespace handler
             }
 
             //Update
-            std::unordered_map<std::string_view, std::any> new_values;
-            if (auto password = utils::get_string(request, "password", ""); password != "")
-            {
-                new_values.insert({"password", password});
-            }
-            if (auto email = utils::get_string(request, "email", ""); email != "")
-            {
-                new_values.insert({"email", email});
-            }
-            if (auto profile = utils::get_string(request, "profile", ""); profile != "")
-            {
-                new_values.insert({"profile", profile});
-            }
+            auto data = utils::retrieve_if_exist(request,{"email","profile","last_login","password"});
 
-            auto result = db::t_user_info::update({{"user_name", user_name}}, new_values);
+            auto result = db::t_user_info::update({{"user_name", user_name}}, data);
             if (result.affected_rows() == 0)
             {
                 SPDLOG_INFO("failed to update");
