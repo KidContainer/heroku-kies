@@ -17,6 +17,7 @@ namespace db
                 return t_user_info{
                     .id = res["id"].as<std::int64_t>(),
                     .user_name = res["user_name"].as<std::string>(),
+                    .gender = res["gender"].as<std::int8_t>(),
                     .password = res["password"].as<std::string>(),
                     .create_time = res["create_time"].as<std::int64_t>(),
                     .last_login = res["last_login"].as<std::string>(),
@@ -31,6 +32,7 @@ namespace db
                 auto sql = fmt::format(R"sql(CREATE TABLE IF NOT EXISTS {} (
                         id              SERIAL PRIMARY KEY,
                         user_name       VARCHAR(200) NOT NULL UNIQUE,
+                        gender          INTEGER NOT NULL,
                         password        VARCHAR(200) NOT NULL,
                         create_time     INTEGER NOT NULL,
                         last_login      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

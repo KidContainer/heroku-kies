@@ -60,6 +60,12 @@ namespace handler
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name or password is not string"), req_content_type::json);
                 return;
             }
+            if (!utils::all_ingeter(request, {"gender"}))
+            {
+                SPDLOG_INFO("gender is not integer");
+                res.set_status_and_content(status_type::ok, utils::resp(10001, "gender is not integer"), req_content_type::json);
+                return;
+            }
 
             //Check if the name has been occupied
             bool exist = false;
@@ -74,6 +80,7 @@ namespace handler
             //Insert
             std::unordered_map<std::string_view, std::any> data = {{"user_name", request["user_name"].get<std::string>()},
                                                                    {"password", request["password"].get<std::string>()},
+                                                                   {"gender", request["gender"].get<std::int8_t>()},
                                                                    {"create_time", utils::now()}};
             if (auto profile = utils::get_string(request, "profile", ""); profile != "")
             {
@@ -121,7 +128,7 @@ namespace handler
         else if (op_type == "fetch")
         {
             //Get the parameter
-            auto condition = utils::retrieve_if_exist(request, {"user_name", "create_time", "last_login", "email", "profile"});
+            auto condition = utils::retrieve_if_exist(request, {"user_name", "create_time", "last_login", "email", "profile", "gender"});
 
             //Get the result
             auto [user_info, exist] = db::t_user_info::fetch_first(condition);
@@ -133,6 +140,7 @@ namespace handler
             }
             nlohmann::json result;
             result["user_name"] = user_info.user_name;
+            result["gender"] = user_info.gender;
             result["create_time"] = user_info.create_time;
             result["last_login"] = user_info.last_login;
             result["email"] = user_info.email;
@@ -163,7 +171,7 @@ namespace handler
             }
 
             //Update
-            auto data = utils::retrieve_if_exist(request,{"email","profile","last_login","password"});
+            auto data = utils::retrieve_if_exist(request, {"email", "profile", "last_login", "password", "gender"});
 
             auto result = db::t_user_info::update({{"user_name", user_name}}, data);
             if (result.affected_rows() == 0)
@@ -194,13 +202,22 @@ namespace handler
                     res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name or password is not string"), req_content_type::json);
                     return;
                 }
+
+                if (!utils::all_ingeter(request, {"gender"}))
+                {
+                    SPDLOG_INFO("gender is not integer");
+                    res.set_status_and_content(status_type::ok, utils::resp(10001, "gender is not integer"), req_content_type::json);
+                    return;
+                }
             }
 
             // Check if contains the same data
             std::unordered_set<std::string> s;
             s.reserve(users.size());
-            for(auto&& item: users){
-                if(s.find(std::string(item["user_name"])) != s.end()){
+            for (auto &&item : users)
+            {
+                if (s.find(std::string(item["user_name"])) != s.end())
+                {
                     SPDLOG_INFO("there are duplicated data");
                     res.set_status_and_content(status_type::ok, utils::resp(10001, "there are duplicated data"), req_content_type::json);
                     return;
@@ -228,6 +245,7 @@ namespace handler
                 //Insert
                 std::unordered_map<std::string_view, std::any> data = {{"user_name", item["user_name"].get<std::string>()},
                                                                        {"password", item["password"].get<std::string>()},
+                                                                       {"gender", item["gender"].get<std::uint8_t>()},
                                                                        {"create_time", utils::now()}};
                 if (auto profile = utils::get_string(item, "profile", ""); profile != "")
                 {
@@ -262,6 +280,7 @@ namespace handler
             {
                 nlohmann::json result;
                 result["user_name"] = item.user_name;
+                result["gender"] = item.gender;
                 result["create_time"] = item.create_time;
                 result["last_login"] = item.last_login;
                 result["email"] = item.email;

@@ -13,6 +13,7 @@ namespace db
         public:
         std::int64_t id;
         std::string user_name;
+        std::int8_t gender;
         std::string password;
         std::int64_t create_time;
         std::string last_login;
