@@ -58,7 +58,7 @@ namespace db
         return result;
     }
 
-    std::vector<t_blog> t_blog::fetch(std::unordered_map<std::string_view, std::any> condition)
+    std::vector<t_blog> t_blog::fetch(std::string_view log_id,std::unordered_map<std::string_view, std::any> condition)
     {
         pqxx::work t(Database::get_conn());
         std::stringstream ss;
@@ -73,7 +73,7 @@ namespace db
                 sep = " AND ";
             }
         }
-        SPDLOG_INFO("sql={}", ss.str());
+        SPDLOG_INFO("log_id={}, sql={}", log_id, ss.str());
         auto result = t.exec(ss.str(), "[FETCH]");
         t.commit();
 
@@ -86,7 +86,7 @@ namespace db
         return user;
     }
 
-    std::tuple<t_blog, bool> t_blog::fetch_first(std::unordered_map<std::string_view, std::any> condition)
+    std::tuple<t_blog, bool> t_blog::fetch_first(std::string_view log_id,std::unordered_map<std::string_view, std::any> condition)
     {
         pqxx::work t(Database::get_conn());
         std::stringstream ss;
@@ -103,7 +103,7 @@ namespace db
         }
         ss << " LIMIT 1";
 
-        SPDLOG_INFO("sql={}", ss.str());
+        SPDLOG_INFO("log_id={},  sql={}", log_id, ss.str());
         auto result = t.exec(ss.str(), "[FETCH FIRST]");
         t.commit();
         if (result.size() == 1)
@@ -113,7 +113,7 @@ namespace db
         return {t_blog{}, false};
     }
 
-    pqxx::result t_blog::remove(std::unordered_map<std::string_view, std::any> condition)
+    pqxx::result t_blog::remove(std::string_view log_id,std::unordered_map<std::string_view, std::any> condition)
     {
         pqxx::work t(Database::get_conn());
         std::stringstream ss;
@@ -129,13 +129,13 @@ namespace db
             }
         }
 
-        SPDLOG_INFO("sql={}", ss.str());
+        SPDLOG_INFO("log_id={}, sql={}", log_id, ss.str());
         auto result = t.exec(ss.str(), "[REMOVE]");
         t.commit();
         return result;
     }
 
-    pqxx::result t_blog::update(std::unordered_map<std::string_view, std::any> condition, std::unordered_map<std::string_view, std::any> value, int limit)
+    pqxx::result t_blog::update(std::string_view log_id,std::unordered_map<std::string_view, std::any> condition, std::unordered_map<std::string_view, std::any> value, int limit)
     {
         if (condition.empty() || value.empty())
         {
@@ -158,13 +158,13 @@ namespace db
             ss << sep << item.first << "=" << t.quote(utils::any_to_string(item.second));
             sep = " AND ";
         }
-        SPDLOG_INFO("sql={}", ss.str());
+        SPDLOG_INFO("log_id={}, sql={}", log_id, ss.str());
         auto result = t.exec(ss.str(), "[UPDATE]");
         t.commit();
         return result;
     }
 
-    pqxx::result t_blog::insert(std::unordered_map<std::string_view, std::any> value)
+    pqxx::result t_blog::insert(std::string_view log_id,std::unordered_map<std::string_view, std::any> value)
     {
         if (value.empty())
         {
@@ -187,13 +187,13 @@ namespace db
             sep = ", ";
         }
         ss << ")";
-        SPDLOG_INFO("sql={}", ss.str());
+        SPDLOG_INFO("log_id={}, sql={}",log_id, ss.str());
         auto result = t.exec(ss.str(), "[INSERT]");
         t.commit();
         return result;
     }
 
-    pqxx::result t_blog::insert(std::vector<std::unordered_map<std::string_view, std::any>> value)
+    pqxx::result t_blog::insert(std::string_view log_id,std::vector<std::unordered_map<std::string_view, std::any>> value)
     {
         if (value.empty())
         {
@@ -222,7 +222,7 @@ namespace db
             ss << ")";
             sep = ", ";
         }
-        SPDLOG_INFO("sql={}", ss.str());
+        SPDLOG_INFO("log_id={}, sql={}", log_id, ss.str());
         auto result = t.exec(ss.str(), "[BATCH INSERT]");
         t.commit();
         return result;

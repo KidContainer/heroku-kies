@@ -13,6 +13,7 @@
 
 #include "../utils/json.hpp"
 #include "../utils/time.hpp"
+#include "../utils/log.hpp"
 
 using namespace cinatra;
 
@@ -20,12 +21,13 @@ namespace handler
 {
     void t_user_info_op(request &req, response &res)
     {
-        SPDLOG_INFO("operation for t_user_info, ip={}", req.get_header_value("X-Forwarded-For"));
+        auto log_id = utils::req_id(req);
+        SPDLOG_INFO("log_id={}, operation for t_user_info, ip={}",log_id, req.get_header_value("X-Forwarded-For"));
 
         //content type check
         if (req.get_content_type() != content_type::string)
         {
-            SPDLOG_WARN("Unsupported ContentType, which is {}", req.get_content_type());
+            SPDLOG_WARN("log_id={}, Unsupported ContentType, which is {}", log_id, req.get_content_type());
             res.set_status_and_content(status_type::ok, utils::resp(10001, "unsupported Content-Type"), req_content_type::json);
             return;
         }
@@ -33,7 +35,7 @@ namespace handler
         //json valid check
         if (!nlohmann::json::accept(req.body()))
         {
-            SPDLOG_WARN("Request body is not a valid json, it's {}", req.body());
+            SPDLOG_WARN("log_id={}, Request body is not a valid json, it's {}",log_id, req.body());
             res.set_status_and_content(status_type::ok, utils::resp(10001, "it's not a valid json"), req_content_type::json);
             return;
         }
@@ -43,7 +45,7 @@ namespace handler
         // get op type
         if (!utils::all_string(request, {"op_type"}))
         {
-            SPDLOG_WARN("Request does not contains op_type");
+            SPDLOG_WARN("log_id={}, Request does not contains op_type", log_id);
             nlohmann::json data;
             data["op_type_enum"] = {"insert", "remove", "fetch", "update", "multi_insert", "multi_fetch"};
             res.set_status_and_content(status_type::ok, utils::resp(10001, "op_type is needed", data), req_content_type::json);
@@ -56,23 +58,23 @@ namespace handler
             //Get the parameter
             if (!utils::all_string(request, {"user_name", "password"}))
             {
-                SPDLOG_INFO("user_name or password is not string");
+                SPDLOG_INFO("log_id={}, user_name or password is not string", log_id);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name or password is not string"), req_content_type::json);
                 return;
             }
             if (!utils::all_ingeter(request, {"gender"}))
             {
-                SPDLOG_INFO("gender is not integer");
+                SPDLOG_INFO("log_id={}, gender is not integer", log_id);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "gender is not integer"), req_content_type::json);
                 return;
             }
 
             //Check if the name has been occupied
             bool exist = false;
-            std::tie(std::ignore, exist) = db::t_user_info::fetch_first({{"user_name", request["user_name"].get<std::string>()}});
+            std::tie(std::ignore, exist) = db::t_user_info::fetch_first(log_id, {{"user_name", request["user_name"].get<std::string>()}});
             if (exist)
             {
-                SPDLOG_INFO("user name '{}' has been registered", request["user_name"].get<std::string>());
+                SPDLOG_INFO("log_id={}, user name '{}' has been registered", log_id, request["user_name"].get<std::string>());
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "user name has been occupied"), req_content_type::json);
                 return;
             }
@@ -91,10 +93,10 @@ namespace handler
                 data.insert({"email", email});
             }
 
-            auto result = db::t_user_info::insert(data);
+            auto result = db::t_user_info::insert(log_id, data);
             if (result.affected_rows() == 0)
             {
-                SPDLOG_INFO("insert failed");
+                SPDLOG_INFO("log_id={}, insert failed", log_id);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "insert failed"), req_content_type::json);
                 return;
             }
@@ -108,16 +110,16 @@ namespace handler
             std::string user_name = "";
             if (user_name = utils::get_string(request, "user_name", ""); user_name == "")
             {
-                SPDLOG_INFO("user_name is missing");
+                SPDLOG_INFO("log_id={}, user_name is missing", log_id);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name is missing"), req_content_type::json);
                 return;
             }
 
             //Remove the user_name
-            auto result = db::t_user_info::remove({{"user_name", user_name}});
+            auto result = db::t_user_info::remove(log_id, {{"user_name", user_name}});
             if (result.affected_rows() == 0)
             {
-                SPDLOG_INFO("failed to remove");
+                SPDLOG_INFO("log_id={}, failed to remove", log_id);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "failed to remove"), req_content_type::json);
                 return;
             }
@@ -131,10 +133,10 @@ namespace handler
             auto condition = utils::retrieve_if_exist(request, {"user_name", "create_time", "last_login", "email", "profile", "gender"});
 
             //Get the result
-            auto [user_info, exist] = db::t_user_info::fetch_first(condition);
+            auto [user_info, exist] = db::t_user_info::fetch_first(log_id, condition);
             if (!exist)
             {
-                SPDLOG_INFO("data does not exist, condition={}", request.dump());
+                SPDLOG_INFO("log_id={}, data does not exist, condition={}",log_id, request.dump());
                 res.set_status_and_content(status_type::ok, utils::resp(10001, fmt::format("data does not exist, condition={}", request.dump())), req_content_type::json);
                 return;
             }
@@ -155,17 +157,17 @@ namespace handler
             std::string user_name = "";
             if (user_name = utils::get_string(request, "user_name", ""); user_name == "")
             {
-                SPDLOG_INFO("user_name is missing");
+                SPDLOG_INFO("log_id={}, user_name is missing", log_id);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name is missing"), req_content_type::json);
                 return;
             }
 
             //Check exist
             bool exist;
-            std::tie(std::ignore, exist) = db::t_user_info::fetch_first({{"user_name", user_name}});
+            std::tie(std::ignore, exist) = db::t_user_info::fetch_first(log_id,{{"user_name", user_name}});
             if (!exist)
             {
-                SPDLOG_INFO("user {} does not exist", user_name);
+                SPDLOG_INFO("log_id={}, user {} does not exist", log_id, user_name);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, fmt::format("user {} does not exist", user_name)), req_content_type::json);
                 return;
             }
@@ -173,10 +175,10 @@ namespace handler
             //Update
             auto data = utils::retrieve_if_exist(request, {"email", "profile", "last_login", "password", "gender"});
 
-            auto result = db::t_user_info::update({{"user_name", user_name}}, data);
+            auto result = db::t_user_info::update(log_id, {{"user_name", user_name}}, data);
             if (result.affected_rows() == 0)
             {
-                SPDLOG_INFO("failed to update");
+                SPDLOG_INFO("log_id={}, failed to update", log_id);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "failed to update"), req_content_type::json);
                 return;
             }
@@ -187,7 +189,7 @@ namespace handler
         {
             if (!request.contains("users") || !request["users"].is_array())
             {
-                SPDLOG_INFO("please use array named users to upload data");
+                SPDLOG_INFO("log_id={}, please use array named users to upload data", log_id);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "please use array named users to upload data"), req_content_type::json);
                 return;
             }
@@ -198,14 +200,14 @@ namespace handler
                 //Get the parameter
                 if (!utils::all_string(item, {"user_name", "password"}))
                 {
-                    SPDLOG_INFO("user_name or password is not string");
+                    SPDLOG_INFO("log_id={}, user_name or password is not string", log_id);
                     res.set_status_and_content(status_type::ok, utils::resp(10001, "user_name or password is not string"), req_content_type::json);
                     return;
                 }
 
                 if (!utils::all_ingeter(item, {"gender"}))
                 {
-                    SPDLOG_INFO("gender is not integer");
+                    SPDLOG_INFO("log_id={}, gender is not integer", log_id);
                     res.set_status_and_content(status_type::ok, utils::resp(10001, "gender is not integer"), req_content_type::json);
                     return;
                 }
@@ -218,7 +220,7 @@ namespace handler
             {
                 if (s.find(std::string(item["user_name"])) != s.end())
                 {
-                    SPDLOG_INFO("there are duplicated data");
+                    SPDLOG_INFO("log_id={}, there are duplicated data", log_id);
                     res.set_status_and_content(status_type::ok, utils::resp(10001, "there are duplicated data"), req_content_type::json);
                     return;
                 }
@@ -230,10 +232,10 @@ namespace handler
             {
                 //Check if the name has been occupied
                 bool exist = false;
-                std::tie(std::ignore, exist) = db::t_user_info::fetch_first({{"user_name", item["user_name"].get<std::string>()}});
+                std::tie(std::ignore, exist) = db::t_user_info::fetch_first(log_id, {{"user_name", item["user_name"].get<std::string>()}});
                 if (exist)
                 {
-                    SPDLOG_INFO("user name '{}' has been registered", item["user_name"].get<std::string>());
+                    SPDLOG_INFO("log_id={}, user name '{}' has been registered", log_id, item["user_name"].get<std::string>());
                     res.set_status_and_content(status_type::ok, utils::resp(10001, "user name has been occupied"), req_content_type::json);
                     return;
                 }
@@ -258,10 +260,10 @@ namespace handler
 
                 all_data.push_back(data);
             }
-            auto result = db::t_user_info::insert(all_data);
+            auto result = db::t_user_info::insert(log_id, all_data);
             if (result.affected_rows() == 0)
             {
-                SPDLOG_INFO("insert failed");
+                SPDLOG_INFO("log_id={}, insert failed", log_id);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "insert failed"), req_content_type::json);
                 return;
             }
@@ -273,7 +275,7 @@ namespace handler
             auto condition = utils::retrieve_if_exist(request, {"user_name", "create_time", "last_login", "email", "profile"});
 
             //Get the result
-            auto users_info = db::t_user_info::fetch(condition);
+            auto users_info = db::t_user_info::fetch(log_id, condition);
             std::vector<nlohmann::json> results;
             results.reserve(users_info.size());
             for (auto &&item : users_info)
@@ -296,12 +298,13 @@ namespace handler
 
     void t_blog_op(cinatra::request &req, cinatra::response &res)
     {
-        SPDLOG_INFO("operation for t_blog_op, ip={}", req.get_header_value("X-Forwarded-For"));
+        auto log_id = utils::req_id(req);
+        SPDLOG_INFO("log_id={}, operation for t_blog_op, ip={}", log_id, req.get_header_value("X-Forwarded-For"));
 
         //content type check
         if (req.get_content_type() != content_type::string)
         {
-            SPDLOG_WARN("Unsupported ContentType, which is {}", req.get_content_type());
+            SPDLOG_WARN("log_id={}, Unsupported ContentType, which is {}", log_id, req.get_content_type());
             res.set_status_and_content(status_type::ok, utils::resp(10001, "unsupported Content-Type"), req_content_type::json);
             return;
         }
@@ -309,7 +312,7 @@ namespace handler
         //json valid check
         if (!nlohmann::json::accept(req.body()))
         {
-            SPDLOG_WARN("Request body is not a valid json, it's {}", req.body());
+            SPDLOG_WARN("log_id={}, Request body is not a valid json, it's {}", log_id, req.body());
             res.set_status_and_content(status_type::ok, utils::resp(10001, "it's not a valid json"), req_content_type::json);
             return;
         }
@@ -319,7 +322,7 @@ namespace handler
         // get op type
         if (!utils::all_string(request, {"op_type"}))
         {
-            SPDLOG_WARN("Request does not contains op_type");
+            SPDLOG_WARN("log_id={}, Request does not contains op_type", log_id);
             nlohmann::json data;
             data["op_type_enum"] = {"insert", "remove", "fetch", "update", "multi_insert", "multi_fetch"};
             res.set_status_and_content(status_type::ok, utils::resp(10001, "op_type is needed", data), req_content_type::json);
@@ -332,7 +335,7 @@ namespace handler
             //Get the parameter
             if (!utils::all_string(request, {"user_id", "content", "title", "sub_title", "tags", "images"}))
             {
-                SPDLOG_INFO("parameter is not missing");
+                SPDLOG_INFO("log_id={}, parameter is not missing", log_id);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "parameter is missing"), req_content_type::json);
                 return;
             }
@@ -341,10 +344,10 @@ namespace handler
 
             //Insert
 
-            auto result = db::t_blog::insert(data);
+            auto result = db::t_blog::insert(log_id, data);
             if (result.affected_rows() == 0)
             {
-                SPDLOG_INFO("insert failed");
+                SPDLOG_INFO("log_id={}, insert failed", log_id);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "insert failed"), req_content_type::json);
                 return;
             }
@@ -358,16 +361,16 @@ namespace handler
             std::int64_t id;
             if (id = utils::get_number(request, "id", -1); id == -1)
             {
-                SPDLOG_INFO("id is missing");
+                SPDLOG_INFO("log_id={}, id is missing", log_id);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "id is missing"), req_content_type::json);
                 return;
             }
 
             //Remove the user_name
-            auto result = db::t_blog::remove({{"id", id}});
+            auto result = db::t_blog::remove(log_id,{{"id", id}});
             if (result.affected_rows() == 0)
             {
-                SPDLOG_INFO("failed to remove");
+                SPDLOG_INFO("log_id={}, failed to remove", log_id);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "failed to remove"), req_content_type::json);
                 return;
             }
@@ -381,10 +384,10 @@ namespace handler
             auto condition = utils::retrieve_if_exist(request, {"id", "user_id", "title"});
 
             //Get the result
-            auto [blog, exist] = db::t_blog::fetch_first(condition);
+            auto [blog, exist] = db::t_blog::fetch_first(log_id, condition);
             if (!exist)
             {
-                SPDLOG_INFO("data does not exist, condition={}", request.dump());
+                SPDLOG_INFO("log_id={}, data does not exist, condition={}", log_id, request.dump());
                 res.set_status_and_content(status_type::ok, utils::resp(10001, fmt::format("data does not exist, condition={}", request.dump())), req_content_type::json);
                 return;
             }
@@ -409,17 +412,17 @@ namespace handler
             std::int64_t id;
             if (id = utils::get_number(request, "id", -1); id == -1)
             {
-                SPDLOG_INFO("id is missing");
+                SPDLOG_INFO("log_id={}, id is missing", log_id);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "id is missing"), req_content_type::json);
                 return;
             }
 
             //Check exist
             bool exist;
-            std::tie(std::ignore, exist) = db::t_blog::fetch_first({{"id", id}});
+            std::tie(std::ignore, exist) = db::t_blog::fetch_first(log_id, {{"id", id}});
             if (!exist)
             {
-                SPDLOG_INFO("id {} does not exist", id);
+                SPDLOG_INFO("log_id={}, id {} does not exist", log_id, id);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, fmt::format("id {} does not exist", id)), req_content_type::json);
                 return;
             }
@@ -427,10 +430,10 @@ namespace handler
             //Update
             auto data = utils::retrieve_if_exist(request, {"content", "create_time", "update_time", "modified_count", "title", "sub_title", "tags", "images"});
 
-            auto result = db::t_user_info::update({{"id", id}}, data);
+            auto result = db::t_user_info::update(log_id, {{"id", id}}, data);
             if (result.affected_rows() == 0)
             {
-                SPDLOG_INFO("failed to update");
+                SPDLOG_INFO("log_id={}, failed to update", log_id);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "failed to update"), req_content_type::json);
                 return;
             }
@@ -441,7 +444,7 @@ namespace handler
         {
             if (!request.contains("blogs") || !request["blogs"].is_array())
             {
-                SPDLOG_INFO("please use array named blogs to upload data");
+                SPDLOG_INFO("log_id={}, please use array named blogs to upload data", log_id);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "please use array named blogs to upload data"), req_content_type::json);
                 return;
             }
@@ -452,7 +455,7 @@ namespace handler
                 //Get the parameter
                 if (!utils::all_string(item, {"user_id", "content", "title", "sub_title", "tags", "images"}))
                 {
-                    SPDLOG_INFO("parameter is wrong");
+                    SPDLOG_INFO("log_id={}, parameter is wrong", log_id);
                     res.set_status_and_content(status_type::ok, utils::resp(10001, "parameter is wrong"), req_content_type::json);
                     return;
                 }
@@ -466,10 +469,10 @@ namespace handler
 
                 all_data.push_back(data);
             }
-            auto result = db::t_user_info::insert(all_data);
+            auto result = db::t_user_info::insert(log_id, all_data);
             if (result.affected_rows() == 0)
             {
-                SPDLOG_INFO("insert failed");
+                SPDLOG_INFO("log_id={}, insert failed", log_id);
                 res.set_status_and_content(status_type::ok, utils::resp(10001, "insert failed"), req_content_type::json);
                 return;
             }
@@ -481,7 +484,7 @@ namespace handler
             auto condition = utils::retrieve_if_exist(request, {"id", "user_id", "title"});
 
             //Get the result
-            auto blogs = db::t_blog::fetch(condition);
+            auto blogs = db::t_blog::fetch(log_id, condition);
             std::vector<nlohmann::json> results;
             results.reserve(blogs.size());
             for (auto &&blog : blogs)
