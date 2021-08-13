@@ -13,7 +13,6 @@ endif()
 add_compile_options(-fsanitize=address -g)
 add_link_options(-fsanitize=address)
 
-add_subdirectory(lib)
 
 if(NOT SKIP_TEST)
     add_subdirectory(utils)
@@ -25,6 +24,7 @@ function(add_all_source src_files)
     set(${src_files} ${${src_files}} PARENT_SCOPE)
 endfunction()
 
+add_subdirectory(lib)
 
 add_all_source(db)
 add_all_source(handler)
