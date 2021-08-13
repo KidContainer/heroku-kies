@@ -13,10 +13,10 @@ namespace handler
     {
         auto log_id = utils::req_id(req);
         SPDLOG_INFO("log_id={}, log_in has been called", log_id);
-        SPDLOG_INFO("log_id={}, content_type={}, true_content_type={}", req.get_content_type(), req.get_header_value("Content-Type"));
+        SPDLOG_INFO("log_id={}, content_type={}, true_content_type={}", log_id, req.get_content_type(), req.get_header_value("Content-Type"));
         //content type check
         if(req.get_content_type() != content_type::string){
-            SPDLOG_ERROR("log_id={}, request type is not string, it's {}", req.get_content_type());
+            SPDLOG_ERROR("log_id={}, request type is not string, it's {}", log_id, req.get_content_type());
             res.set_status_and_content(status_type::ok, utils::resp(10001,"content type is wrong"), req_content_type::json);
             return;
         }
