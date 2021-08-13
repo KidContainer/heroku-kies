@@ -12,9 +12,8 @@ namespace handler
     void log_in(cinatra::request &req, cinatra::response &res)
     {
         auto log_id = utils::req_id(req);
-        spdlog::set_level(spdlog::level::level_enum::trace);
         SPDLOG_INFO("log_id={}, log_in has been called", log_id);
-        SPDLOG_DEBUG("log_id={}, content_type={}, true_content_type={}", req.get_content_type(), req.get_header_value("Content-Type"));
+        SPDLOG_INFO("log_id={}, content_type={}, true_content_type={}", req.get_content_type(), req.get_header_value("Content-Type"));
         //content type check
         if(req.get_content_type() != content_type::string){
             SPDLOG_ERROR("log_id={}, request type is not string, it's {}", req.get_content_type());
