@@ -21,7 +21,7 @@ namespace handler
             return;
         }
 
-
+        res.set_status_and_content(status_type::ok, utils::resp(), req_content_type::json);
 
     }
     void log_out(cinatra::request &req, cinatra::response &res)
