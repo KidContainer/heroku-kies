@@ -6,8 +6,9 @@
 
 namespace utils
 {
-    template<typename T>
-    std::tuple<T, std::string_view, bool> parse_request(const cinatra::request& req){
+    template <typename T>
+    std::tuple<T, std::string_view, bool> parse_request(const cinatra::request &req)
+    {
         auto log_id = utils::req_id(req);
         SPDLOG_INFO("log_id={}, content_type={}, true_content_type={}", log_id, req.get_content_type(), req.get_header_value("Content-Type"));
         //content type check
@@ -17,17 +18,24 @@ namespace utils
             return {T{}, log_id, false};
         }
 
-        auto j = nlohmann::json::parse(req.body(), nullptr, false);
-        if (j.is_discarded())
+        try
         {
-            SPDLOG_ERROR("log_id={}, message=fail to parse json, body={}", req.body());
+
+            auto j = nlohmann::json::parse(req.body(), nullptr, false);
+            if (j.is_discarded())
+            {
+                SPDLOG_ERROR("log_id={}, message=fail to parse json, body={}", req.body());
+                return {T{}, log_id, false};
+            }
+
+            return {T{j}, log_id, true};
+        }
+        catch (std::exception &e)
+        {
+            SPDLOG_ERROR("log_id={}, err=%v", e.what());
             return {T{}, log_id, false};
         }
-
-        return {T{j}, log_id, true};
     }
 } // namespace utils
-
-
 
 #endif
