@@ -27,6 +27,7 @@ namespace utils
                 SPDLOG_ERROR("log_id={}, message=fail to parse json, body={}", req.body());
                 return {T{}, log_id, false};
             }
+            SPDLOG_INFO("log_id={}", log_id);
 
             return {T{j}, log_id, true};
         }
