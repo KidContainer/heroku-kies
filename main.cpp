@@ -3,7 +3,6 @@
 #include <spdlog/spdlog.h>
 
 #include "handler/page.hpp"
-#include "handler/table_manage.hpp"
 #include "handler/user.hpp"
 
 #include "utils/file.hpp"
@@ -20,10 +19,6 @@ void bind_page(http_server &server)
 
 void bind_api(http_server &server)
 {
-    //db operation for debug
-    server.set_http_handler<POST>("/api/db/t_user_info_op", handler::t_user_info_op);
-    server.set_http_handler<POST>("api/db/t_blog", handler::t_blog_op);
-
     //user management
     server.set_http_handler<GET,POST>("/api/user/log_in", handler::log_in);
 }

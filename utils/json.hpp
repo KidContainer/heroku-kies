@@ -5,8 +5,13 @@
 #include <string_view>
 #include <vector>
 #include <unordered_map>
+#include <tuple>
 #include <any>
+#include <optional>
 #include <nlohmann/json.hpp>
+
+
+
 namespace utils
 {
     std::string resp(int status_code = 0, std::string_view status_message = "", nlohmann::json data = nlohmann::json());
@@ -23,13 +28,23 @@ namespace utils
 
     std::string get_string(const nlohmann::json &data, std::string name, std::string default_value);
 
+    std::optional<std::string> get_string(const nlohmann::json& data, std::string name);
+
     long long get_number(const nlohmann::json &data, std::string name, long long default_value);
+
+    std::optional<long long> get_number(const nlohmann::json& data, std::string name);
 
     int get_integer(const nlohmann::json &data, std::string name, int default_value);
 
+    std::optional<int> get_integer(const nlohmann::json &data, std::string name);
+
     double get_float(const nlohmann::json &data, std::string name, double default_value);
 
-    bool all_boolean(const nlohmann::json &data, std::string name, bool default_value);
+    std::optional<double> get_float(const nlohmann::json &data, std::string name);
+
+    bool get_boolean(const nlohmann::json &data, std::string name, bool default_value);
+
+    std::optional<bool> get_boolean(const nlohmann::json &data, std::string name);
 
     std::vector<std::string> to_string_vector(const std::string_view data);
 

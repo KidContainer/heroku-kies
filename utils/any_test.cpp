@@ -13,10 +13,8 @@ TEST(ANY_TEST, ANY_TEST_1)
     EXPECT_EQ("hello", utils::any_to_string("hello"s));
     EXPECT_EQ("true", utils::any_to_string(true));
     EXPECT_EQ("false", utils::any_to_string(false));
-    EXPECT_THAT(utils::any_to_string(1.2),HasSubstr("unsupported type"));
-    EXPECT_THAT(utils::any_to_string('a'),HasSubstr("unsupported type"));
-
-
+    EXPECT_THAT(utils::any_to_string(1.2), HasSubstr("unsupported type"));
+    EXPECT_THAT(utils::any_to_string('a'), HasSubstr("unsupported type"));
 }
 
 int main(int argc, char **argv)
