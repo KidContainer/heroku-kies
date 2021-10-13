@@ -20,7 +20,7 @@ void bind_page(http_server &server)
 void bind_api(http_server &server)
 {
     //user management
-    server.set_http_handler<GET,POST>("/api/user/log_in", handler::log_in);
+    server.set_http_handler<POST>("/api/user/log_in", handler::log_in);
 }
 
 int main()

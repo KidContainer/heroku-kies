@@ -32,7 +32,7 @@ namespace utils
         }
         catch (std::exception &e)
         {
-            SPDLOG_ERROR("log_id={}, err=%v", e.what());
+            SPDLOG_ERROR("log_id={}, request.body(), err=%v", log_id,req.body(), e.what());
             return {T{}, log_id, false};
         }
     }
