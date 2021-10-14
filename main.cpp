@@ -7,7 +7,6 @@
 
 #include "utils/file.hpp"
 
-#include "db/db_operate.hpp"
 #include "db/t_user_info.hpp"
 
 using namespace cinatra;
@@ -39,10 +38,7 @@ int main()
 
     bind_page(server);
     bind_api(server);
-
-    db::database_init();
-
-
+    SPDLOG_INFO("server starts with {} threads", max_thread_num);
     server.run();    
 
     return 0;

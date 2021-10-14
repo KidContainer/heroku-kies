@@ -17,45 +17,27 @@ namespace db
                 return t_user_info{
                     .id = res["id"].as<std::int64_t>(),
                     .user_name = res["user_name"].as<std::string>(),
-                    .gender = res["gender"].as<std::int16_t>(),
                     .password = res["password"].as<std::string>(),
-                    .create_time = res["create_time"].as<std::int64_t>(),
-                    .last_login = res["last_login"].as<std::string>(),
+                    .true_name = res["true_name"].as<std::string>(),
+                    .nick_name = res["nick_name"].as<std::string>(),
+                    .gender = res["gender"].as<std::string>(),
+                    .age = res["age"].as<std::uint16_t>(),
                     .email = res["email"].as<std::string>(),
-                    .profile = res["profile"].as<std::string>(),
+                    .address = res["address"].as<std::string>(),
+                    .phone = res["phone"].as<std::string>(),
+                    .relationship = res["relationship"].as<std::string>(""),
+                    .profile_image = res["profile_image"].as<std::string>(""),
+                    .work = res["work"].as<std::string>(""),
+                    .interest = res["interest"].as<std::string>(""),
+                    .create_time = res["create_time"].as<std::int64_t>(),
+                    .last_login_time = res["last_login_time"].as<std::int64_t>(),
+                    .create_ip = res["create_ip"].as<std::string>(),
+                    .last_login_ip = res["last_login_ip"].as<std::string>(),
+                    .login_count = res["login_count"].as<std::uint64_t>(),
                 };
         }
 
-        pqxx::result t_user_info::create_table()
-        {
-                pqxx::work t(Database::get_conn());
-                auto sql = fmt::format(R"sql(CREATE TABLE IF NOT EXISTS {} (
-                        id              SERIAL PRIMARY KEY,
-                        user_name       VARCHAR(200) NOT NULL UNIQUE,
-                        gender          SMALLINT NOT NULL,
-                        password        VARCHAR(200) NOT NULL,
-                        create_time     INTEGER NOT NULL,
-                        last_login      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        email           VARCHAR(100) DEFAULT '[no email]',
-                        profile         VARCHAR(300) DEFAULT '/img/profile/default_profile.jpeg'
-                ))sql",
-                                       table_name());
-
-                SPDLOG_INFO("sql={}", sql);
-                auto result = t.exec(sql, "[CREATE TABLE]");
-                t.commit();
-                return result;
-        }
-
-        pqxx::result t_user_info::delete_table()
-        {
-                pqxx::work t(Database::get_conn());
-                auto result = t.exec(fmt::format(R"sql(DROP TABLE {})sql", table_name()), "[DROP TABLE]");
-                t.commit();
-                return result;
-        }
-
-        std::vector<t_user_info> t_user_info::fetch(std::string_view log_id,std::unordered_map<std::string_view, std::any> condition)
+        std::vector<t_user_info> t_user_info::fetch(std::string_view log_id, std::map<std::string_view, std::any> condition)
         {
                 pqxx::work t(Database::get_conn());
                 std::stringstream ss;
@@ -70,7 +52,7 @@ namespace db
                                 sep = " AND ";
                         }
                 }
-                SPDLOG_INFO("log_id={}, sql={}",log_id, ss.str());
+                SPDLOG_INFO("log_id={}, sql={}", log_id, ss.str());
                 auto result = t.exec(ss.str(), "[FETCH]");
                 t.commit();
 
@@ -83,7 +65,7 @@ namespace db
                 return user;
         }
 
-        std::tuple<t_user_info, bool> t_user_info::fetch_first(std::string_view log_id,std::unordered_map<std::string_view, std::any> condition)
+        std::tuple<t_user_info, bool> t_user_info::fetch_first(std::string_view log_id, std::map<std::string_view, std::any> condition)
         {
                 pqxx::work t(Database::get_conn());
                 std::stringstream ss;
@@ -110,7 +92,7 @@ namespace db
                 return {t_user_info{}, false};
         }
 
-        pqxx::result t_user_info::remove(std::string_view log_id,std::unordered_map<std::string_view, std::any> condition)
+        pqxx::result t_user_info::remove(std::string_view log_id, std::map<std::string_view, std::any> condition)
         {
                 pqxx::work t(Database::get_conn());
                 std::stringstream ss;
@@ -132,7 +114,7 @@ namespace db
                 return result;
         }
 
-        pqxx::result t_user_info::update(std::string_view log_id,std::unordered_map<std::string_view, std::any> condition, std::unordered_map<std::string_view, std::any> value, int limit)
+        pqxx::result t_user_info::update(std::string_view log_id, std::map<std::string_view, std::any> condition, std::unordered_map<std::string_view, std::any> value, int limit)
         {
                 if (condition.empty() || value.empty())
                 {
@@ -161,7 +143,7 @@ namespace db
                 return result;
         }
 
-        pqxx::result t_user_info::insert(std::string_view log_id,std::unordered_map<std::string_view, std::any> value)
+        pqxx::result t_user_info::insert(std::string_view log_id, std::unordered_map<std::string_view, std::any> value)
         {
                 if (value.empty())
                 {
@@ -190,7 +172,7 @@ namespace db
                 return result;
         }
 
-        pqxx::result t_user_info::insert(std::string_view log_id,std::vector<std::unordered_map<std::string_view, std::any>> value)
+        pqxx::result t_user_info::insert(std::string_view log_id, std::vector<std::unordered_map<std::string_view, std::any>> value)
         {
                 if (value.empty())
                 {

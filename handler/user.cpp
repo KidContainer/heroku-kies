@@ -5,6 +5,8 @@
 #include "../utils/json.hpp"
 #include "../utils/cinatra.hpp"
 #include "../dto/user.hpp"
+#include "../utils/time.hpp"
+#include "../db/t_user_info.hpp"
 
 using namespace cinatra;
 
@@ -12,7 +14,6 @@ namespace handler
 {
     void log_in(cinatra::request &req, cinatra::response &res)
     {
-
         auto [param, log_id, success] = utils::parse_request<dto::UserLogInRequest>(req);
         if (!success)
         {
@@ -21,7 +22,37 @@ namespace handler
             return;
         }
 
-        res.set_status_and_content(status_type::ok, utils::resp(), req_content_type::json);
+        auto session = req.get_session().lock();
+        if (session != nullptr)
+        {
+            session->set_max_age(30);
+            SPDLOG_INFO("log_id={}, user {} has logged in, value in session is {}", log_id, param.user_name, session->get_data<std::string>("user_name"));
+            res.set_status_and_content(status_type::ok, utils::resp(0, "", fmt::format("welcome {}", session->get_data<std::string>("nick_name"))), req_content_type::json);
+            return;
+        }
+
+        if (auto [user, exist] = db::t_user_info::fetch_first(log_id, {{"user_name", param.user_name}, {"password", param.password}}); exist)
+        {
+            std::unordered_map<std::string_view, std::any> map = {
+                {"last_login_time", utils::now()},
+                {"last_login_ip", utils::get_ip(req)},
+                {"login_count", user.login_count + 1}};
+            auto result = db::t_user_info::update(log_id, {{"user_name", param.user_name}, {"password", param.password}}, map, 1);
+            if (result.affected_rows() == 1)
+            {
+                if (param.remember_me)
+                {
+                    auto session = res.start_session();
+                    session->set_data("nick_name", user.nick_name);
+                    session->set_max_age(1800);
+                }
+                SPDLOG_INFO("log_id={}, user {} has logged in", log_id, param.user_name);
+                res.set_status_and_content(status_type::ok, utils::resp(0, "", fmt::format("welcome {}", user.nick_name)), req_content_type::json);
+                return;
+            }
+        }
+
+        res.set_status_and_content(status_type::ok, utils::resp(10001, "failed to login"), req_content_type::json);
     }
 
     void log_out(cinatra::request &req, cinatra::response &res)

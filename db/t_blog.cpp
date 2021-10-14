@@ -27,38 +27,7 @@ namespace db
         };
     }
 
-    pqxx::result t_blog::create_table()
-    {
-        pqxx::work t(Database::get_conn());
-        auto sql = fmt::format(R"sql(CREATE TABLE IF NOT EXISTS {} (
-                        id              SERIAL PRIMARY KEY,
-                        user_id         INTEGER NOT NULL,
-                        content         TEXT NOT NULL,
-                        create_time     INTEGER NOT NULL,
-                        update_time     INTEGER NOT NULL,
-                        modified_count  INTEGER DEFAULT 0,
-                        title           VARCHAR(150) DEFAULT '',
-                        sub_title       VARCHAR(300) DEFAULT '',
-                        tags            VARCHAR(300) DEFAULT '',
-                        images          TEXT DEFAULT ''
-                ))sql",
-                               table_name());
-
-        SPDLOG_INFO("sql={}", sql);
-        auto result = t.exec(sql, "[CREATE TABLE]");
-        t.commit();
-        return result;
-    }
-
-    pqxx::result t_blog::delete_table()
-    {
-        pqxx::work t(Database::get_conn());
-        auto result = t.exec(fmt::format(R"sql(DROP TABLE {})sql", table_name()), "[DROP TABLE]");
-        t.commit();
-        return result;
-    }
-
-    std::vector<t_blog> t_blog::fetch(std::string_view log_id,std::unordered_map<std::string_view, std::any> condition)
+    std::vector<t_blog> t_blog::fetch(std::string_view log_id,std::map<std::string_view, std::any> condition)
     {
         pqxx::work t(Database::get_conn());
         std::stringstream ss;
@@ -86,7 +55,7 @@ namespace db
         return user;
     }
 
-    std::tuple<t_blog, bool> t_blog::fetch_first(std::string_view log_id,std::unordered_map<std::string_view, std::any> condition)
+    std::tuple<t_blog, bool> t_blog::fetch_first(std::string_view log_id,std::map<std::string_view, std::any> condition)
     {
         pqxx::work t(Database::get_conn());
         std::stringstream ss;
@@ -113,7 +82,7 @@ namespace db
         return {t_blog{}, false};
     }
 
-    pqxx::result t_blog::remove(std::string_view log_id,std::unordered_map<std::string_view, std::any> condition)
+    pqxx::result t_blog::remove(std::string_view log_id,std::map<std::string_view, std::any> condition)
     {
         pqxx::work t(Database::get_conn());
         std::stringstream ss;
@@ -135,7 +104,7 @@ namespace db
         return result;
     }
 
-    pqxx::result t_blog::update(std::string_view log_id,std::unordered_map<std::string_view, std::any> condition, std::unordered_map<std::string_view, std::any> value, int limit)
+    pqxx::result t_blog::update(std::string_view log_id,std::map<std::string_view, std::any> condition, std::unordered_map<std::string_view, std::any> value, int limit)
     {
         if (condition.empty() || value.empty())
         {

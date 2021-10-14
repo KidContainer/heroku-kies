@@ -3,6 +3,11 @@
 
 #include <cinatra.hpp>
 #include <tuple>
+#include <string_view>
+#include <spdlog/spdlog.h>
+#include <nlohmann/json.hpp>
+
+#include "log.hpp"
 
 namespace utils
 {
@@ -29,6 +34,9 @@ namespace utils
             return {T{}, log_id, false};
         }
     }
+
+    std::string get_ip(cinatra::request& req);
+
 } // namespace utils
 
 #endif

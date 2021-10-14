@@ -5,6 +5,7 @@
 #include <string_view>
 #include <pqxx/pqxx>
 #include <vector>
+#include <map>
 #include <unordered_map>
 #include <any>
 
@@ -31,17 +32,13 @@ namespace db
         public:
         static inline std::string table_name();
 
-        static pqxx::result create_table();
+        static std::vector<t_blog> fetch(std::string_view log_id,std::map<std::string_view, std::any> condition);
 
-        static pqxx::result delete_table();
+        static std::tuple<t_blog,bool> fetch_first(std::string_view log_id,std::map<std::string_view, std::any> condition);
 
-        static std::vector<t_blog> fetch(std::string_view log_id,std::unordered_map<std::string_view, std::any> condition);
+        static pqxx::result remove(std::string_view log_id,std::map<std::string_view, std::any> condition);
 
-        static std::tuple<t_blog,bool> fetch_first(std::string_view log_id,std::unordered_map<std::string_view, std::any> condition);
-
-        static pqxx::result remove(std::string_view log_id,std::unordered_map<std::string_view, std::any> condition);
-
-        static pqxx::result update(std::string_view log_id,std::unordered_map<std::string_view, std::any> condition, std::unordered_map<std::string_view, std::any> value, int limit=0);
+        static pqxx::result update(std::string_view log_id,std::map<std::string_view, std::any> condition, std::unordered_map<std::string_view, std::any> value, int limit=0);
 
         static pqxx::result insert(std::string_view log_id,std::unordered_map<std::string_view, std::any> value);
 
