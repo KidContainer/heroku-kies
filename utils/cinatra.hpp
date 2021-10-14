@@ -21,7 +21,7 @@ namespace utils
 
         try
         {
-            return {T{nlohmann::json::parse(req.body())}, log_id, true};
+            return {nlohmann::json::parse(req.body()), log_id, true};
         }
         catch (std::exception &e)
         {

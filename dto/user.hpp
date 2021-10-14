@@ -86,7 +86,7 @@ namespace dto
         std::optional<std::string> work;
         std::optional<std::string> interest;
 
-        void from_json(const nlohmann::json &j, UpdateUserRequest &u)
+        friend void from_json(const nlohmann::json &j, UpdateUserRequest &u)
         {
             FROM_JSON_STR_OPT(j, u, password);
             FROM_JSON_STR_OPT(j, u, true_name);
@@ -102,7 +102,7 @@ namespace dto
             FROM_JSON_STR_OPT(j, u, interest);
         }
 
-        void to_json(nlohmann::json &j, const UpdateUserRequest &u)
+        friend void to_json(nlohmann::json &j, const UpdateUserRequest &u)
         {
             TO_JSON_OPT_WITH_DEFAULT(j, u, password, "");
             TO_JSON_OPT_WITH_DEFAULT(j, u, true_name, "");
