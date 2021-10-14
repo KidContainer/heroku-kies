@@ -85,8 +85,7 @@ namespace handler
             res.set_status_and_content(status_type::ok, utils::resp(10000, "failed to parse the parameters"), req_content_type::json);
             return;
         }
-        dto::GetUserInfoResponse response;
-        response.true_name = "Kie";
-        res.set_status_and_content(status_type::ok, utils::resp(0, "", response), req_content_type::json);
+
+        res.set_status_and_content(status_type::ok, utils::resp(0, ""), req_content_type::json);
     }
 } // namespace handler
