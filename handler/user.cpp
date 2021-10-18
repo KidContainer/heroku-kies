@@ -16,10 +16,7 @@ using namespace constant;
 namespace handler
 {
     void log_in(cinatra::request &req, cinatra::response &res)
-    {
-        res.set_status_and_content(status_type::ok, utils::resp(StatusCode::FailedToLogIn, "【MOCK】"), req_content_type::json);
-        return;
-        
+    {        
         auto [param, log_id, success] = utils::parse_request<dto::UserLogInRequest>(req);
         if (!success)
         {
