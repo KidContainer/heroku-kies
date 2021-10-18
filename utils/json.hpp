@@ -11,10 +11,12 @@
 #include <nlohmann/json.hpp>
 
 
+#include "../constant/error_code.hpp"
+
 
 namespace utils
 {
-    std::string resp(int status_code = 0, std::string_view status_message = "", nlohmann::json data = nlohmann::json());
+    std::string resp(constant::StatusCode status_code = constant::StatusCode::Success, std::string_view status_message = "", nlohmann::json data = nlohmann::json());
 
     bool all_string(const nlohmann::json &data, std::initializer_list<std::string> names);
 
@@ -49,6 +51,8 @@ namespace utils
     std::vector<std::string> to_string_vector(const std::string_view data);
 
     std::unordered_map<std::string_view, std::any> retrieve_if_exist(const nlohmann::json& data, std::initializer_list<std::string_view> names);
+
+    std::tuple<std::string,bool> to_string(const nlohmann::json& data);
 } // namespace utils
 
 #endif

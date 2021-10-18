@@ -13,7 +13,6 @@ namespace db
             static pqxx::connection& get_conn();
 
             static std::string print_result(pqxx::result result, bool print_col_name=true);
-        
     };
 } // namespace db
 

@@ -1,5 +1,9 @@
 #include "db_manager.hpp"
 #include <spdlog/spdlog.h>
+
+
+#include <thread>
+
 namespace db
 {
     pqxx::connection &Database::get_conn()
@@ -47,6 +51,7 @@ namespace db
             SPDLOG_ERROR("connection does not open");
             std::terminate();
         }
+        SPDLOG_INFO("Success to connect to database");
         return conn;
     }();
 

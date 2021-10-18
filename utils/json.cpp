@@ -3,7 +3,7 @@
 
 namespace utils
 {
-    std::string resp(int status_code, std::string_view status_message, nlohmann::json data)
+    std::string resp(constant::StatusCode status_code, std::string_view status_message, nlohmann::json data)
     {
         nlohmann::json j;
         j["status_code"] = status_code;
@@ -187,6 +187,24 @@ namespace utils
             }
         }
         return result;
+    }
+
+    std::tuple<std::string,bool> to_string(const nlohmann::json& data){
+        if(data.is_null()){
+            return {"null", true};
+        }else if(data.is_number_integer()){
+            return {std::to_string(data.get<std::int64_t>()), true};
+        }else if(data.is_number_unsigned()){
+            return {std::to_string(data.get<std::uint64_t>()), true};
+        }else if(data.is_boolean()){
+            return {data.get<bool>()?"true":"false", true};
+        }else if(data.is_number_float()){
+            return {std::to_string(data.get<double>()), true};
+        }else if(data.is_string()){
+            return {data.get<std::string>(), true};
+        }else{
+            return {"", false};
+        }
     }
 
 } // namespace utils

@@ -44,7 +44,7 @@ namespace dto
         std::string password;
         std::string true_name;
         std::string nick_name;
-        std::string gneder;
+        std::string gender;
         std::uint8_t age;
         std::string email;
         std::string address;
@@ -59,7 +59,7 @@ namespace dto
                                        password,
                                        true_name,
                                        nick_name,
-                                       gneder,
+                                       gender,
                                        age,
                                        email,
                                        address,
@@ -73,6 +73,7 @@ namespace dto
     // Update user information
     struct UpdateUserRequest
     {
+        std::string user_name;
         std::optional<std::string> password;
         std::optional<std::string> true_name;
         std::optional<std::string> nick_name;
@@ -88,6 +89,7 @@ namespace dto
 
         friend void from_json(const nlohmann::json &j, UpdateUserRequest &u)
         {
+            FROM_JSON_STR(j, u, user_name, "");
             FROM_JSON_STR_OPT(j, u, password);
             FROM_JSON_STR_OPT(j, u, true_name);
             FROM_JSON_STR_OPT(j, u, nick_name);
@@ -104,6 +106,7 @@ namespace dto
 
         friend void to_json(nlohmann::json &j, const UpdateUserRequest &u)
         {
+            TO_JSON(j, u, user_name);
             TO_JSON_OPT_WITH_DEFAULT(j, u, password, "");
             TO_JSON_OPT_WITH_DEFAULT(j, u, true_name, "");
             TO_JSON_OPT_WITH_DEFAULT(j, u, nick_name, "");
@@ -133,7 +136,7 @@ namespace dto
         std::string true_name;
         std::string nick_name;
         std::string gender;
-        std::uint8_t age;
+        std::uint16_t age;
         std::string email;
         std::string address;
         std::string phone;

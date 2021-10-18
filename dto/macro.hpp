@@ -27,4 +27,6 @@
 
 #define TO_JSON_OPT_WITH_DEFAULT(j, u, name, dv) if(u.name.has_value()) j[#name] = u.name.value(); else j[#name] = dv;
 
+#define ADD_TO_MAP_OPT(m, u, name) if(u.name.has_value()) m[#name] = u.name;
+
 #endif

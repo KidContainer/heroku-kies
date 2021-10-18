@@ -37,6 +37,8 @@ namespace utils
 
     std::string get_ip(cinatra::request& req);
 
+    std::shared_ptr<cinatra::session> check_and_refresh_session(cinatra::request& req ,bool need_refresh = true);
+
 } // namespace utils
 
 #endif
