@@ -17,6 +17,9 @@ namespace handler
 {
     void log_in(cinatra::request &req, cinatra::response &res)
     {
+        res.set_status_and_content(status_type::ok, utils::resp(StatusCode::FailedToLogIn, "【MOCK】"), req_content_type::json);
+        return;
+        
         auto [param, log_id, success] = utils::parse_request<dto::UserLogInRequest>(req);
         if (!success)
         {
@@ -31,9 +34,6 @@ namespace handler
             res.set_status_and_content(status_type::ok, utils::resp(StatusCode::Success, "", fmt::format("welcome {}", session->get_data<std::string>("nick_name"))), req_content_type::json);
             return;
         }
-
-        res.set_status_and_content(status_type::ok, utils::resp(StatusCode::FailedToLogIn, "【MOCK】"), req_content_type::json);
-        return;
 
         if (auto [user, exist] = db::t_user_info::fetch_first(log_id, {{"user_name", param.user_name}, {"password", param.password}}); exist)
         {
