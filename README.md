@@ -10,6 +10,6 @@ This is the source code for kies on heroku. It's a HTTP server which provide som
 |dto| The type to represent a kind of json structure|
 handler| The bussiness logistic source code|
 |lib| The third party libraries which are not provided by conan, only for C++ part|
-|src| The source code of HTML, CSS, JavaScript and other resources used by front end part|
+|web| The source code of HTML, CSS, JavaScript and other resources used by front end part|
 |utils| The utility source code of C++ part|
 |www| The static file folder for the whole application|
