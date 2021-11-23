@@ -1,4 +1,4 @@
-# heroku-kies
+# kies-heroku-fullstack
 
 ![CMake](https://github.com/KieQ/heroku-kies/workflows/CMake/badge.svg)
 
