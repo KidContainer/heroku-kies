@@ -4,7 +4,7 @@
 
 **This repository has been splited into two repositories and no longer maintained.**
 
-**For detail, please check [KieQ/kies-code-backend](https://github.com/KieQ/kies-code-backend) and [KieQ/kie-code-frontend](https://github.com/KieQ/kies-code-frondend)**
+**For detail, please check [KieQ/kies-code-backend](https://github.com/KieQ/kies-code-backend) and [KieQ/kie-code-frontend](https://github.com/KieQ/kies-code-frontend)**
 
 This is the source code for kies on heroku. It's a HTTP server which provide some calculation task for `kies`.
 
